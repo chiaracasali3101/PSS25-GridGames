@@ -2,7 +2,7 @@ package it.unibo.gridgames.persistence;
 
 import it.unibo.gridgames.model.GameRecordImpl;
 import it.unibo.gridgames.model.GameType;
-import it.unibo.gridgames.view.UIConstants;
+
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -30,6 +30,16 @@ public class ScoreManagerTest {
     private static final long DURATION_60 = 60L;
     private static final long DURATION_120 = 120L;
     private static final long DURATION_180 = 180L;
+
+    private static final int SCORE_20 = 20;
+    private static final int SCORE_100 = 100;
+    private static final int SCORE_200 = 200;
+    private static final int SCORE_300 = 300;
+    private static final int RECORDS_LIMIT = 1;
+
+    private static final int MOVES_0 = 0;
+    private static final int MOVES_10 = 10;
+    private static final int MOVES_20 = 20;
 
     @TempDir
     private Path tempDir;
@@ -112,22 +122,30 @@ public class ScoreManagerTest {
     public void testGetHighestScore() throws IOException {
     final LocalDateTime now = LocalDateTime.now().withNano(0);
     this.scoreManager.saveScore(new GameRecordImpl(
-        P1,  UIConstants.SCORE_100.getValue(), GameType.GAME_2048, 10, DURATION_60, now));
-    this.scoreManager.saveScore(new GameRecordImpl(P2, 
-        UIConstants.SCORE_300.getValue(), 
+        P1, SCORE_100, GameType.GAME_2048, 10, DURATION_60, now));
+    this.scoreManager.saveScore(new GameRecordImpl(
+        P2, 
+        SCORE_300, 
         GameType.GAME_2048, 
-        UIConstants.SCORE_20.getValue(), 
+        SCORE_20, 
         DURATION_120, now)); // BOB su GAME_2048
     this.scoreManager.saveScore(new GameRecordImpl(
         P3, 
-        UIConstants.SCORE_200.getValue(), 
+        SCORE_200, 
         GameType.PUZZLE_15, 
-        UIConstants.SCORE_20.getValue(), 
+        SCORE_20,
         DURATION_180, now));
 
     final GameRecordImpl highest = this.scoreManager.getHighestScore(GameType.GAME_2048);
     assertNotNull(highest, "Il punteggio più alto non dovrebbe essere null");
-    assertEquals(UIConstants.SCORE_300, highest.getScore());
+    assertEquals(SCORE_300, highest.getScore());
     assertEquals(P2, highest.getPlayerName());
 }
+
+    @Test 
+    public void testGetAverageScore() {
+        //Salva 2 o 3 record per uno stesso gioco
+        //Chiama scoreManager.getAverageScore(GameType.2048).
+        //Verifica con un'assertEquals che la media calcolata sia corretta (200.0).
+    }
 }

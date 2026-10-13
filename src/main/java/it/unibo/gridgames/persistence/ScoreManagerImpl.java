@@ -29,6 +29,8 @@ import java.util.stream.Collectors;
 public class ScoreManagerImpl implements ScoreManager {
     private static final String GAMETYPE_NO_NULL = "GameType cannot be null";
 
+    private static final int TIMESTAMP_INDEX = 5;
+
     private final Path filePath;
 
     /**
@@ -102,7 +104,7 @@ public class ScoreManagerImpl implements ScoreManager {
                     final GameType gameType = GameType.valueOf(tokens[2].trim().toUpperCase(Locale.ROOT));
                     final int moves = Integer.parseInt(tokens[3].trim());
                     final long durationSeconds = Long.parseLong(tokens[4].trim());
-                    final LocalDateTime timestamp = LocalDateTime.parse(tokens[UIConstants.TIMESTAMP_INDEX.getValue()].trim());
+                    final LocalDateTime timestamp = LocalDateTime.parse(tokens[TIMESTAMP_INDEX].trim());
                     final GameRecordImpl record = new GameRecordImpl(playerName, score, gameType, moves,
                             durationSeconds, timestamp);
                     records.add(record);

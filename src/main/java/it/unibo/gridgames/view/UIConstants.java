@@ -10,18 +10,7 @@ public enum UIConstants {
     FONT_SIZE_TITLE(36),
     GRID_SIZE(10),
     BUTTON_BACK(15),
-    EXPECTED_FIELDS_COUNT(6),
-    SCORE_20(20),
-    SCORE_100(100),
-    SCORE_200(200),
-    SCORE_300(300),
-    RECORDS_LIMIT(1),
-
-    MOVES_0(0),
-    MOVES_10(10),
-    MOVES_20(20),
-
-    TIMESTAMP_INDEX(5);
+    EXPECTED_FIELDS_COUNT(6);
 
     private final int value;
 

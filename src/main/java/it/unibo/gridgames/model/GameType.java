@@ -1,6 +1,6 @@
 package it.unibo.gridgames.model;
 
-//GameType = elenco dei giochi 
+//GameType = elenco dei giochi. File enum
 
 /**
  * Represents the available grid games in the application.
