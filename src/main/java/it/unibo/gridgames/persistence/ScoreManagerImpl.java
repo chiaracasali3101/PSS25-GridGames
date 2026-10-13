@@ -6,7 +6,7 @@ import java.util.Locale;
 
 import it.unibo.gridgames.model.GameRecordImpl;
 import it.unibo.gridgames.model.GameType;
-import it.unibo.gridgames.view.UIConstants;
+import it.unibo.gridgames.persistence.PersistenceConstants;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
@@ -98,7 +98,7 @@ public class ScoreManagerImpl implements ScoreManager {
                 }
 
                 final String[] tokens = line.split(",");
-                if (tokens.length >= UIConstants.EXPECTED_FIELDS_COUNT.getValue()) {
+                if (tokens.length >= PersistenceConstants.EXPECTED_FIELDS_COUNT.getValue()) {
                     final String playerName = tokens[0].trim();
                     final int score = Integer.parseInt(tokens[1].trim());
                     final GameType gameType = GameType.valueOf(tokens[2].trim().toUpperCase(Locale.ROOT));
