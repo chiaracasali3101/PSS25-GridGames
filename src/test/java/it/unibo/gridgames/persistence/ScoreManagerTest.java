@@ -66,7 +66,7 @@ public class ScoreManagerTest {
      * @throws IOException issued if there is an error reading or writing the score file.
      */
     @Test
-    public void testLoadScoresWhenFileDoesNotExist() throws IOException {
+    void testLoadScoresWhenFileDoesNotExist() throws IOException {
         final List<GameRecordImpl> scores = this.scoreManager.loadAllScores();
         assertTrue(scores.isEmpty(), "La lista deve essere vuota se il file non esiste");
     }
@@ -77,7 +77,7 @@ public class ScoreManagerTest {
      * @throws IOException issued if there is an error reading or writing the score file.
      */
     @Test
-    public void testGetNumberOfGamesPlayed() throws IOException {
+    void testGetNumberOfGamesPlayed() throws IOException {
         final LocalDateTime now = LocalDateTime.now().withNano(0);
         final GameRecordImpl record1 = new GameRecordImpl(P1, 100, GameType.GAME_2048, 10, DURATION_60, now);
         final GameRecordImpl record2 = new GameRecordImpl(P2, 200, GameType.SUDOKU, 20, DURATION_120, now);
@@ -101,7 +101,7 @@ public class ScoreManagerTest {
      * @throws IOException issued if there is an error reading or writing the score file.
      */
     @Test
-    public void getTopScore() throws IOException {
+    void getTopScore() throws IOException {
         final LocalDateTime now = LocalDateTime.now().withNano(0);
         final GameRecordImpl record1 = new GameRecordImpl(P1, 100, GameType.GAME_2048, 10, DURATION_60, now);
         final GameRecordImpl record2 = new GameRecordImpl(P2, 200, GameType.SUDOKU, 20, DURATION_120, now);
@@ -124,7 +124,7 @@ public class ScoreManagerTest {
      * @throws IOException issued if there is an error reading or writing the score file.
      */
     @Test
-    public void testGetHighestScore() throws IOException {
+    void testGetHighestScore() throws IOException {
     final LocalDateTime now = LocalDateTime.now().withNano(0);
     this.scoreManager.saveScore(new GameRecordImpl(
         P1, SCORE_100, GameType.GAME_2048, 10, DURATION_60, now));
@@ -153,7 +153,7 @@ public class ScoreManagerTest {
  * @throws IOException
  */
     @Test 
-    public void testGetAverageScore() throws IOException{
+    void testGetAverageScore() throws IOException{
         final LocalDateTime now = LocalDateTime.now().withNano(0);
         this.scoreManager.saveScore(new GameRecordImpl(P1, 100, GameType.GAME_2048, 10, DURATION_60, LocalDateTime.now()));
         this.scoreManager.saveScore(new GameRecordImpl(P2, 200, GameType.GAME_2048, 20, DURATION_120, LocalDateTime.now()));
@@ -169,7 +169,7 @@ public class ScoreManagerTest {
      * @throws IOException
      */
     @Test 
-    public void testloadAllScores() throws IOException{
+    void testloadAllScores() throws IOException{
         final LocalDateTime now = LocalDateTime.now().withNano(0);
         this.scoreManager.saveScore(new GameRecordImpl(P1, 100, GameType.GAME_2048, 10, DURATION_60, LocalDateTime.now()));
         this.scoreManager.saveScore(new GameRecordImpl(P2, 200, GameType.GAME_2048, 20, DURATION_120, LocalDateTime.now()));
