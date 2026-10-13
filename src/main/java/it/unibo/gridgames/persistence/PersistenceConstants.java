@@ -1,7 +1,7 @@
 package it.unibo.gridgames.persistence;
 
 /** 
- * UIConstants defines constants used for UI layout and styling.
+ * PersistenceConstants defines constants used for UI layout and styling.
  */
 
 public enum PersistenceConstants {
@@ -14,7 +14,7 @@ public enum PersistenceConstants {
     }
 
     /**
-     * Returns the integer value associated with the UI constant.
+     * Returns the integer value associated with the constant.
      * 
      * @return value 
      */
