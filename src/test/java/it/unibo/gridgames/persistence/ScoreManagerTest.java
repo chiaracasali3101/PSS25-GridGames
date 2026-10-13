@@ -3,7 +3,6 @@ package it.unibo.gridgames.persistence;
 import it.unibo.gridgames.model.GameRecordImpl;
 import it.unibo.gridgames.model.GameType;
 
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
@@ -21,7 +20,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * Unit tests for the ScoreManager class.
  * ScoreManagerTest
  */
-public class ScoreManagerTest {
+class ScoreManagerTest {
 
     private static final String P1 = "Alice";
     private static final String P2 = "Bob";
@@ -35,11 +34,10 @@ public class ScoreManagerTest {
     private static final int SCORE_100 = 100;
     private static final int SCORE_200 = 200;
     private static final int SCORE_300 = 300;
-    private static final int RECORDS_LIMIT = 1;
 
-    private static final int MOVES_0 = 0;
     private static final int MOVES_10 = 10;
     private static final int MOVES_20 = 20;
+    private static final int MOVES_30 = 30;
 
     private static final double EXPECTED_AVERAGE = 200.0;
     private static final double DELTA = 0.001;
@@ -87,9 +85,6 @@ public class ScoreManagerTest {
         this.scoreManager.saveScore(record2);
         this.scoreManager.saveScore(record3);
 
-        System.out.println("NOME ENUM: " + GameType.PUZZLE_15.name());
-        System.out.println("RECORD LETTI: " + this.scoreManager.loadAllScores());
-
         assertEquals(1, this.scoreManager.getNumberOfGamesPlayed(GameType.GAME_2048));
         assertEquals(1, this.scoreManager.getNumberOfGamesPlayed(GameType.SUDOKU));
         assertEquals(1, this.scoreManager.getNumberOfGamesPlayed(GameType.PUZZLE_15));
@@ -101,7 +96,7 @@ public class ScoreManagerTest {
      * @throws IOException issued if there is an error reading or writing the score file.
      */
     @Test
-    void getTopScore() throws IOException {
+    void testGetTopScore() throws IOException {
         final LocalDateTime now = LocalDateTime.now().withNano(0);
         final GameRecordImpl record1 = new GameRecordImpl(P1, 100, GameType.GAME_2048, 10, DURATION_60, now);
         final GameRecordImpl record2 = new GameRecordImpl(P2, 200, GameType.SUDOKU, 20, DURATION_120, now);
@@ -147,42 +142,40 @@ public class ScoreManagerTest {
     assertEquals(P2, highest.getPlayerName());
 }
 
-/**
- * Test for the getAverageScore method of ScoreManager.
- * 
- * @throws IOException
- */
+    /**
+     * Test for the getAverageScore method of ScoreManager.
+     * 
+     * @throws IOException if an error occurs while saving test scores.
+     */
     @Test 
-    void testGetAverageScore() throws IOException{
-        final LocalDateTime now = LocalDateTime.now().withNano(0);
-        this.scoreManager.saveScore(new GameRecordImpl(P1, 100, GameType.GAME_2048, 10, DURATION_60, LocalDateTime.now()));
-        this.scoreManager.saveScore(new GameRecordImpl(P2, 200, GameType.GAME_2048, 20, DURATION_120, LocalDateTime.now()));
-        this.scoreManager.saveScore(new GameRecordImpl(P3, 300, GameType.GAME_2048, 30, DURATION_180, LocalDateTime.now()));
+    void testGetAverageScore() throws IOException {
+        this.scoreManager.saveScore(new GameRecordImpl(
+            P1, SCORE_100, GameType.GAME_2048, 10, DURATION_60, LocalDateTime.now()));
+        this.scoreManager.saveScore(new GameRecordImpl(
+            P2, SCORE_200, GameType.GAME_2048, MOVES_20, DURATION_120, LocalDateTime.now()));
+        this.scoreManager.saveScore(new GameRecordImpl(
+            P3, SCORE_300, GameType.GAME_2048, MOVES_30, DURATION_180, LocalDateTime.now()));
 
-        final double actual_average = this.scoreManager.getAverageScore(GameType.GAME_2048);
-        assertEquals(EXPECTED_AVERAGE, actual_average, DELTA, "La media calcolata non è corretta");
+        final double actualAverage = this.scoreManager.getAverageScore(GameType.GAME_2048);
+        assertEquals(EXPECTED_AVERAGE, actualAverage, DELTA, "La media calcolata non è corretta");
     }
 
     /**
      * Test for the loadAllScores method of ScoreManager.
      * 
-     * @throws IOException
+     * @throws IOException if an I/O error occurs during file operations.
      */
     @Test 
-    void testloadAllScores() throws IOException{
-        final LocalDateTime now = LocalDateTime.now().withNano(0);
-        this.scoreManager.saveScore(new GameRecordImpl(P1, 100, GameType.GAME_2048, 10, DURATION_60, LocalDateTime.now()));
-        this.scoreManager.saveScore(new GameRecordImpl(P2, 200, GameType.GAME_2048, 20, DURATION_120, LocalDateTime.now()));
-        this.scoreManager.saveScore(new GameRecordImpl(P3, 300, GameType.GAME_2048, 30, DURATION_180, LocalDateTime.now()));
+    void testloadAllScores() throws IOException {
+        this.scoreManager.saveScore(new GameRecordImpl(
+            P1, SCORE_100, GameType.GAME_2048, MOVES_10, DURATION_60, LocalDateTime.now()));
+        this.scoreManager.saveScore(new GameRecordImpl(
+            P2, SCORE_200, GameType.GAME_2048, MOVES_20, DURATION_120, LocalDateTime.now()));
+        this.scoreManager.saveScore(new GameRecordImpl(
+            P3, SCORE_300, GameType.GAME_2048, MOVES_30, DURATION_180, LocalDateTime.now()));
 
         final List<GameRecordImpl> allScores = this.scoreManager.loadAllScores();
-        assertEquals(EXPECTED_TOTAL_RECORDS, allScores.size(), "Il numero totale di record caricati non corrisponde a quello salvato");
-    }
-
-    /**
-     * Test for the size method of ScoreManager.
-     */
-    private void size() {
-        throw new UnsupportedOperationException("Unimplemented method 'size'");
+        assertEquals(EXPECTED_TOTAL_RECORDS, allScores.size(), 
+        "Il numero totale di record caricati non corrisponde a quello salvato");
     }
 }

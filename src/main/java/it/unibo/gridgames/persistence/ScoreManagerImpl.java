@@ -6,7 +6,6 @@ import java.util.Locale;
 
 import it.unibo.gridgames.model.GameRecordImpl;
 import it.unibo.gridgames.model.GameType;
-import it.unibo.gridgames.persistence.PersistenceConstants;
 
 import java.io.BufferedWriter;
 import java.io.IOException;

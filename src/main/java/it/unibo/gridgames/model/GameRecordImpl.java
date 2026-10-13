@@ -15,7 +15,7 @@ public class GameRecordImpl {
     private final GameType gameType;
     private final int moves;
     private final long durationSeconds;
-    private final java.time.LocalDateTime timestamp;
+    private final LocalDateTime timestamp;
 
     /**
      * Constructs a new {@code GameRecordImpl} instance.
