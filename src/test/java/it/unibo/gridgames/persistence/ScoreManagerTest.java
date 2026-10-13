@@ -41,6 +41,11 @@ public class ScoreManagerTest {
     private static final int MOVES_10 = 10;
     private static final int MOVES_20 = 20;
 
+    private static final double EXPECTED_AVERAGE = 200.0;
+    private static final double DELTA = 0.001;
+
+    private static final int EXPECTED_TOTAL_RECORDS = 3;
+
     @TempDir
     private Path tempDir;
 
@@ -142,10 +147,42 @@ public class ScoreManagerTest {
     assertEquals(P2, highest.getPlayerName());
 }
 
+/**
+ * Test for the getAverageScore method of ScoreManager.
+ * 
+ * @throws IOException
+ */
     @Test 
-    public void testGetAverageScore() {
-        //Salva 2 o 3 record per uno stesso gioco
-        //Chiama scoreManager.getAverageScore(GameType.2048).
-        //Verifica con un'assertEquals che la media calcolata sia corretta (200.0).
+    public void testGetAverageScore() throws IOException{
+        final LocalDateTime now = LocalDateTime.now().withNano(0);
+        this.scoreManager.saveScore(new GameRecordImpl(P1, 100, GameType.GAME_2048, 10, DURATION_60, LocalDateTime.now()));
+        this.scoreManager.saveScore(new GameRecordImpl(P2, 200, GameType.GAME_2048, 20, DURATION_120, LocalDateTime.now()));
+        this.scoreManager.saveScore(new GameRecordImpl(P3, 300, GameType.GAME_2048, 30, DURATION_180, LocalDateTime.now()));
+
+        final double actual_average = this.scoreManager.getAverageScore(GameType.GAME_2048);
+        assertEquals(EXPECTED_AVERAGE, actual_average, DELTA, "La media calcolata non è corretta");
+    }
+
+    /**
+     * Test for the loadAllScores method of ScoreManager.
+     * 
+     * @throws IOException
+     */
+    @Test 
+    public void testloadAllScores() throws IOException{
+        final LocalDateTime now = LocalDateTime.now().withNano(0);
+        this.scoreManager.saveScore(new GameRecordImpl(P1, 100, GameType.GAME_2048, 10, DURATION_60, LocalDateTime.now()));
+        this.scoreManager.saveScore(new GameRecordImpl(P2, 200, GameType.GAME_2048, 20, DURATION_120, LocalDateTime.now()));
+        this.scoreManager.saveScore(new GameRecordImpl(P3, 300, GameType.GAME_2048, 30, DURATION_180, LocalDateTime.now()));
+
+        final List<GameRecordImpl> allScores = this.scoreManager.loadAllScores();
+        assertEquals(EXPECTED_TOTAL_RECORDS, allScores.size(), "Il numero totale di record caricati non corrisponde a quello salvato");
+    }
+
+    /**
+     * Test for the size method of ScoreManager.
+     */
+    private void size() {
+        throw new UnsupportedOperationException("Unimplemented method 'size'");
     }
 }
