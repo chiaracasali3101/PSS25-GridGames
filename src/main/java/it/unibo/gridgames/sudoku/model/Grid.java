@@ -19,4 +19,14 @@ public final class Grid {
             }
         }
     }
+
+    /**
+     * Returns the cell at the given position.
+     *
+     * @param position the position of the cell
+     * @return the cell at that position
+     */
+    public Cell getCell(final Position position) {
+        return cells[position.getRow()][position.getColumn()];
+    }
 }
