@@ -15,13 +15,13 @@ public class GameRecordImpl {
     private final GameType gameType;
     private final int moves;
     private final long durationSeconds;
-    private final java.time.LocalDateTime timestamp;
+    private final LocalDateTime timestamp;
 
     /**
      * Constructs a new {@code GameRecordImpl} instance.
      * 
      * @param playerName      the name of the player
-     * @param score           the score achieved by the player
+     * @param score2           the score achieved by the player
      * @param gameType        the type of the game played
      * @param moves           the number of moves made by the player
      * @param durationSeconds the duration of the game in seconds
@@ -31,7 +31,7 @@ public class GameRecordImpl {
      */
 
     // costruttore per il record di gioco
-    public GameRecordImpl(final String playerName, final int score, final GameType gameType, final int moves,
+    public GameRecordImpl(final String playerName, final int score2, final GameType gameType, final int moves,
             final long durationSeconds, final LocalDateTime timestamp) {
         if (playerName == null || playerName.isBlank()) {
             throw new IllegalArgumentException("Player name cannot be null or blank");
@@ -39,12 +39,12 @@ public class GameRecordImpl {
         if (playerName.contains(",")) {
             throw new IllegalArgumentException("Player name cannot contain commas");
         }
-        if (score < 0 || moves < 0 || durationSeconds < 0) {
+        if (score2 < 0 || moves < 0 || durationSeconds < 0) {
             throw new IllegalArgumentException("Metrics cannot be negative");
         }
 
         this.playerName = playerName;
-        this.score = score;
+        this.score = score2;
         this.gameType = Objects.requireNonNull(gameType, "GameType cannot be null");
         this.timestamp = Objects.requireNonNull(timestamp, "Timestamp cannot be null");
         this.moves = moves;
