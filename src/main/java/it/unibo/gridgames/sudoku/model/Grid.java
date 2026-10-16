@@ -3,8 +3,7 @@ package it.unibo.gridgames.sudoku.model;
 /** Represents the 9x9 Sudoku grid.*/
 public final class Grid {
     /**
-     * Number of rows and columns of the grid.
-     */
+     * Number of rows and columns of the grid.*/
     public static final int SIZE = 9;
 
     private final Cell[][] cells = new Cell[SIZE][SIZE];
@@ -19,6 +18,11 @@ public final class Grid {
             }
         }
     }
+
+        /**
+     * Number of rows and columns of each 3x3 box.
+     */
+    public static final int BOX_SIZE = 3;
 
     /**
      * Returns the cell at the given position.
