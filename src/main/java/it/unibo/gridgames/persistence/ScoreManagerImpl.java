@@ -4,8 +4,8 @@ import java.nio.file.Path;
 import java.util.Objects;
 import java.util.Locale;
 
-import it.unibo.gridgames.model.GameRecordImpl;
-import it.unibo.gridgames.model.GameType;
+import it.unibo.gridgames.model.score.GameRecordImpl;
+import it.unibo.gridgames.model.score.GameType;
 
 import java.io.BufferedWriter;
 import java.io.IOException;

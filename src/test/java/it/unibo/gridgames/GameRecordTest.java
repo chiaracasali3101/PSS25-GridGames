@@ -6,8 +6,8 @@ import java.time.LocalDateTime;
 
 import org.junit.jupiter.api.Test;
 
-import it.unibo.gridgames.model.GameRecordImpl;
-import it.unibo.gridgames.model.GameType;
+import it.unibo.gridgames.model.score.GameRecordImpl;
+import it.unibo.gridgames.model.score.GameType;
 
 /**
  * Unit tests for the GameRecord class.

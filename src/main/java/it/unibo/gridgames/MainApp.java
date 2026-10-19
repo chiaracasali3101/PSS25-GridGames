@@ -1,7 +1,7 @@
 package it.unibo.gridgames;
 
-import it.unibo.gridgames.view.LeaderboardView;
-import it.unibo.gridgames.view.MainAppView;
+import it.unibo.gridgames.view.menuAndPersistence.MainAppView;
+import it.unibo.gridgames.view.menuAndPersistence.LeaderboardView;
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
@@ -33,7 +33,7 @@ public final class MainApp extends Application {
             final LeaderboardView leaderboardView = new LeaderboardView();
             leaderboardView.setOnBackSelected(() -> scene.setRoot(view));
 
-            // mostra la classifica
+            // mostra la schermata della classifica
             scene.setRoot(leaderboardView);
         });
     }

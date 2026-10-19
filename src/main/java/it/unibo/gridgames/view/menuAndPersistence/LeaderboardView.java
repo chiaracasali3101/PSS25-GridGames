@@ -1,6 +1,7 @@
-package it.unibo.gridgames.view;
+package it.unibo.gridgames.view.menuAndPersistence;
 
 import javafx.scene.layout.BorderPane;
+import it.unibo.gridgames.view.UIConstants;
 import javafx.geometry.Insets;
 import javafx.scene.control.Button;
 

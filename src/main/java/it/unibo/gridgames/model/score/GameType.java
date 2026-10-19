@@ -1,4 +1,4 @@
-package it.unibo.gridgames.model;
+package it.unibo.gridgames.model.score;
 
 //GameType = elenco dei giochi. File enum
 

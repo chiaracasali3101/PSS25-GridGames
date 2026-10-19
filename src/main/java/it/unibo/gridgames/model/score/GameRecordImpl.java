@@ -1,4 +1,4 @@
-package it.unibo.gridgames.model;
+package it.unibo.gridgames.model.score;
 
 import java.time.LocalDateTime;
 import java.util.Objects;

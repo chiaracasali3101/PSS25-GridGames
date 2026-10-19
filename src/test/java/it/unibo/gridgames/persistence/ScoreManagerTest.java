@@ -1,7 +1,7 @@
 package it.unibo.gridgames.persistence;
 
-import it.unibo.gridgames.model.GameRecordImpl;
-import it.unibo.gridgames.model.GameType;
+import it.unibo.gridgames.model.score.GameRecordImpl;
+import it.unibo.gridgames.model.score.GameType;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
