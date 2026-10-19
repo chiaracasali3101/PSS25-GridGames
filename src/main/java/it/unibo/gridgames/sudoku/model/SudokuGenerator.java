@@ -42,6 +42,30 @@ public final class SudokuGenerator {
         return grid;
     }
 
+        /**
+     * Creates a puzzle from a full grid by emptying some of its cells.
+     * The cells that keep their value become fixed. The full grid is not modified.
+     *
+     * @param solution   a full, valid grid
+     * @param difficulty how many cells to empty
+     * @return a new grid with empty cells for the player to fill
+     */
+    public Grid createPuzzle(final Grid solution, final Difficulty difficulty) {
+        final List<Position> positions = new ArrayList<>();
+        for (int row = 0; row < Grid.SIZE; row++) {
+            for (int col = 0; col < Grid.SIZE; col++) {
+                positions.add(new Position(row, col));
+            }
+        }
+        Collections.shuffle(positions, random);
+        final Grid puzzle = new Grid();
+        for (int i = difficulty.getCellsToRemove(); i < positions.size(); i++) {
+            final Position position = positions.get(i);
+            puzzle.setCell(position, new Cell(solution.getCell(position).getValue(), true));
+        }
+        return puzzle;
+    }
+
     private boolean fill(final Grid grid, final int index) {
         if (index == CELL_COUNT) {
             return true;

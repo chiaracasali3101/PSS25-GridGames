@@ -33,4 +33,14 @@ public final class Grid {
     public Cell getCell(final Position position) {
         return cells[position.getRow()][position.getColumn()];
     }
+
+    /**
+     * Replaces the cell at the given position.
+     *
+     * @param position the position of the cell to replace
+     * @param cell     the new cell
+     */
+    public void setCell(final Position position, final Cell cell) {
+        cells[position.getRow()][position.getColumn()] = cell;
+    }
 }
