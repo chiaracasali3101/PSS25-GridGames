@@ -15,6 +15,7 @@ public final class SudokuGame {
     private final Difficulty difficulty;
     private int emptyCells;
     private int errors;
+    private int moves;
     private GameStatus status = GameStatus.PLAYING;
 
     /**
@@ -55,6 +56,7 @@ public final class SudokuGame {
         if (status != GameStatus.PLAYING || !cell.isEmpty()) {
             return MoveResult.NOT_ALLOWED;
         }
+        moves++;
         if (value == solution.getCell(position).getValue()) {
             cell.setValue(value);
             emptyCells--;
@@ -97,6 +99,15 @@ public final class SudokuGame {
      */
     public int getErrors() {
         return errors;
+    }
+
+    /**
+     * Returns the number of moves made so far, both right and wrong.
+     *
+     * @return the number of moves
+     */
+    public int getMoves() {
+        return moves;
     }
 
     /**
