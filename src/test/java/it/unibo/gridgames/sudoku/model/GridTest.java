@@ -29,7 +29,8 @@ class GridTest {
         grid.getCell(position).setValue(VALUE);
         assertEquals(VALUE, grid.getCell(position).getValue());
     }
-        @Test
+
+    @Test
     void setCellReplacesCell() {
         final Grid grid = new Grid();
         final Position position = new Position(2, 3);

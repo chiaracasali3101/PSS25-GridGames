@@ -19,16 +19,16 @@ public final class SudokuGenerator {
      * Creates a generator that produces a different grid each time.
      */
     public SudokuGenerator() {
-        this(new Random());
+        this.random = new Random();
     }
 
     /**
-     * Creates a generator that uses the given source of randomness.
+     * Creates a generator that always produces the same grids for the same seed.
      *
-     * @param random the source of randomness used to shuffle the numbers
+     * @param seed the starting value of the random sequence
      */
-    public SudokuGenerator(final Random random) {
-        this.random = random;
+    public SudokuGenerator(final long seed) {
+        this.random = new Random(seed);
     }
 
     /**
@@ -42,7 +42,7 @@ public final class SudokuGenerator {
         return grid;
     }
 
-        /**
+    /**
      * Creates a puzzle from a full grid by emptying some of its cells.
      * The cells that keep their value become fixed. The full grid is not modified.
      *

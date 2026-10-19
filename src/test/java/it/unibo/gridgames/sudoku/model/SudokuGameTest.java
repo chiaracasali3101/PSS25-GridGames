@@ -3,8 +3,6 @@ package it.unibo.gridgames.sudoku.model;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-import java.util.Random;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -17,8 +15,8 @@ class SudokuGameTest {
 
     @BeforeEach
     void setUp() {
-        solution = new SudokuGenerator(new Random(SEED)).generateFullGrid();
-        game = new SudokuGame(Difficulty.EASY, new SudokuGenerator(new Random(SEED)));
+        solution = new SudokuGenerator(SEED).generateFullGrid();
+        game = new SudokuGame(Difficulty.EASY, new SudokuGenerator(SEED));
     }
 
     @Test

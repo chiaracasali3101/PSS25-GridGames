@@ -4,8 +4,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import java.util.Random;
-
 import org.junit.jupiter.api.Test;
 
 class SudokuGeneratorTest {
@@ -14,7 +12,7 @@ class SudokuGeneratorTest {
 
     @Test
     void fullGridHasNoEmptyCells() {
-        final Grid grid = new SudokuGenerator(new Random(SEED)).generateFullGrid();
+        final Grid grid = new SudokuGenerator(SEED).generateFullGrid();
         for (int row = 0; row < Grid.SIZE; row++) {
             for (int col = 0; col < Grid.SIZE; col++) {
                 assertFalse(grid.getCell(new Position(row, col)).isEmpty());
@@ -24,7 +22,7 @@ class SudokuGeneratorTest {
 
     @Test
     void fullGridRespectsRules() {
-        final Grid grid = new SudokuGenerator(new Random(SEED)).generateFullGrid();
+        final Grid grid = new SudokuGenerator(SEED).generateFullGrid();
         final SudokuValidator validator = new SudokuValidator();
         for (int row = 0; row < Grid.SIZE; row++) {
             for (int col = 0; col < Grid.SIZE; col++) {
@@ -37,8 +35,8 @@ class SudokuGeneratorTest {
 
     @Test
     void sameSeedGivesSameGrid() {
-        final Grid first = new SudokuGenerator(new Random(SEED)).generateFullGrid();
-        final Grid second = new SudokuGenerator(new Random(SEED)).generateFullGrid();
+        final Grid first = new SudokuGenerator(SEED).generateFullGrid();
+        final Grid second = new SudokuGenerator(SEED).generateFullGrid();
         for (int row = 0; row < Grid.SIZE; row++) {
             for (int col = 0; col < Grid.SIZE; col++) {
                 final Position position = new Position(row, col);
@@ -50,7 +48,7 @@ class SudokuGeneratorTest {
         @Test
     void puzzleHasRightNumberOfEmptyCells() {
         for (final Difficulty difficulty : Difficulty.values()) {
-            final SudokuGenerator generator = new SudokuGenerator(new Random(SEED));
+            final SudokuGenerator generator = new SudokuGenerator(SEED);
             final Grid puzzle = generator.createPuzzle(generator.generateFullGrid(), difficulty);
             assertEquals(difficulty.getCellsToRemove(), countEmptyCells(puzzle));
         }
@@ -58,7 +56,7 @@ class SudokuGeneratorTest {
 
     @Test
     void puzzleCellsAreFixedOnlyIfFilled() {
-        final SudokuGenerator generator = new SudokuGenerator(new Random(SEED));
+        final SudokuGenerator generator = new SudokuGenerator(SEED);
         final Grid solution = generator.generateFullGrid();
         final Grid puzzle = generator.createPuzzle(solution, Difficulty.MEDIUM);
         for (int row = 0; row < Grid.SIZE; row++) {
@@ -77,7 +75,7 @@ class SudokuGeneratorTest {
 
     @Test
     void createPuzzleDoesNotChangeSolution() {
-        final SudokuGenerator generator = new SudokuGenerator(new Random(SEED));
+        final SudokuGenerator generator = new SudokuGenerator(SEED);
         final Grid solution = generator.generateFullGrid();
         generator.createPuzzle(solution, Difficulty.HARD);
         assertEquals(0, countEmptyCells(solution));
