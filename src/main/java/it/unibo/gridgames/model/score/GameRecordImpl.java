@@ -9,7 +9,7 @@ import java.util.Objects;
  * Represents an immutable record of a completed game session.
  */
 
-public class GameRecordImpl {
+public class GameRecordImpl implements GameRecord {
     private final String playerName;
     private final int score;
     private final GameType gameType;
@@ -110,5 +110,62 @@ public class GameRecordImpl {
      */
     public final LocalDateTime getTimestamp() {
         return this.timestamp;
+    }
+
+    /**
+     * Compares this game record to another object for equality.
+     *
+     * @param obj the object to compare with
+     * @return true if both objects have identical fields, false otherwise
+     */
+    @Override
+    public boolean equals(final Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null || getClass() != obj.getClass()) {
+            return false;
+        }
+        final GameRecordImpl other = (GameRecordImpl) obj;
+        return this.score == other.score
+            && this.moves == other.moves
+            && this.durationSeconds == other.durationSeconds
+            && Objects.equals(this.playerName, other.playerName)
+            && this.gameType == other.gameType
+            && Objects.equals(this.timestamp, other.timestamp);
+    }
+
+    /**
+     * Generates the hash code for this game record.
+     *
+     * @return the integer hash code
+     */
+    @Override
+    public int hashCode() {
+        return Objects.hash(
+            this.playerName,
+            this.score,
+            this.gameType,
+            this.moves,
+            this.durationSeconds,
+            this.timestamp
+        );
+    }
+
+    /**
+     * Returns a string representation of this game record.
+     *
+     * @return a formatted string containing the record details
+     */
+    @Override
+    public String toString() {
+        return "GameRecordImpl{"
+            + "playerName='" + this.playerName + '\''
+            + ", score=" + this.score
+            + ", gameType=" + this.gameType
+            + ", moves=" + this.moves
+            + ", durationSeconds=" + this.durationSeconds
+            + ", timestamp=" + this.timestamp
+            + '}';
     }
 }
