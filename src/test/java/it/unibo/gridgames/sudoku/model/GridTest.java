@@ -29,4 +29,12 @@ class GridTest {
         grid.getCell(position).setValue(VALUE);
         assertEquals(VALUE, grid.getCell(position).getValue());
     }
+        @Test
+    void setCellReplacesCell() {
+        final Grid grid = new Grid();
+        final Position position = new Position(2, 3);
+        grid.setCell(position, new Cell(VALUE, true));
+        assertEquals(VALUE, grid.getCell(position).getValue());
+        assertTrue(grid.getCell(position).isFixed());
+    }
 }
