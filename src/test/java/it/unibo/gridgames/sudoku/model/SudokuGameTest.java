@@ -106,4 +106,13 @@ class SudokuGameTest {
         }
         throw new IllegalStateException("No fixed cell");
     }
+
+    @Test
+    void movesCountRightAndWrongButNotIgnored() {
+        final Position empty = findEmptyCell();
+        game.play(empty, wrongValue(empty));
+        game.play(empty, rightValue(empty));
+        game.play(findFixedCell(), 1);
+        assertEquals(2, game.getMoves());
+    }
 }
