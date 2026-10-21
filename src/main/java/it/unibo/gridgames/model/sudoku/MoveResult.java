@@ -1,4 +1,4 @@
-package it.unibo.gridgames.sudoku.model;
+package it.unibo.gridgames.model.sudoku;
 
 /**
  * The possible outcomes of a move.
