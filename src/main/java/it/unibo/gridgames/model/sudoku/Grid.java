@@ -1,4 +1,4 @@
-package it.unibo.gridgames.sudoku.model;
+package it.unibo.gridgames.model.sudoku;
 
 /** Represents the 9x9 Sudoku grid. */
 public final class Grid {

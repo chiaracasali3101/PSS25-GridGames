@@ -1,4 +1,4 @@
-package it.unibo.gridgames.sudoku.model;
+package it.unibo.gridgames.model.sudoku;
 
 /**
  * Computes the score of a finished Sudoku game.

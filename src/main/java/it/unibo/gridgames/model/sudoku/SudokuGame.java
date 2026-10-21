@@ -1,4 +1,4 @@
-package it.unibo.gridgames.sudoku.model;
+package it.unibo.gridgames.model.sudoku;
 
 /**
  * A single Sudoku game: the puzzle, its solution, the errors and the status.
