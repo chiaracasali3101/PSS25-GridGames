@@ -54,7 +54,7 @@ class ScoreManagerTest {
      */
     @BeforeEach
     public void setUp() {
-        final Path testFile = this.tempDir.resolve("test_scores.csv");
+        final Path testFile = this.tempDir.resolve("test_scores.json");
         this.scoreManager = new ScoreManagerImpl(testFile);
     }
 
