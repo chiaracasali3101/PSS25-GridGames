@@ -1,4 +1,4 @@
-package it.unibo.gridgames.view.menuAndPersistence;
+package it.unibo.gridgames.view.menu;
 
 import javafx.scene.layout.BorderPane;
 import javafx.scene.paint.Color;

@@ -1,7 +1,8 @@
 package it.unibo.gridgames;
 
-import it.unibo.gridgames.view.menuAndPersistence.MainAppView;
-import it.unibo.gridgames.view.menuAndPersistence.LeaderboardView;
+import it.unibo.gridgames.controller.leaderboard.MenuController;
+import it.unibo.gridgames.view.menu.LeaderboardView;
+import it.unibo.gridgames.view.menu.MainAppView;
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
@@ -25,17 +26,11 @@ public final class MainApp extends Application {
             System.out.println("Apertura Classifics & Statistiche (Chiara)");
         });*/
 
+        new MenuController(view, scene);
+        
         stage.setTitle("GridGames");
         stage.setScene(scene);
         stage.show();
-
-        view.setOnLeaderboardSelected(() -> {
-            final LeaderboardView leaderboardView = new LeaderboardView();
-            leaderboardView.setOnBackSelected(() -> scene.setRoot(view));
-
-            // mostra la schermata della classifica
-            scene.setRoot(leaderboardView);
-        });
     }
 
     /**
