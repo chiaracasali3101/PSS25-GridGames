@@ -27,21 +27,24 @@ import java.util.stream.Collectors;
 
 public class ScoreManagerImpl implements ScoreManager {
     private static final String GAMETYPE_NO_NULL = "GameType cannot be null";
-
     private static final int TIMESTAMP_INDEX = 5;
-
     private final Path filePath;
 
     /**
-     * Constructor for ScoreManagerImpl that takes a file path as a parameter.
-     * 
-     * @param filePath the path to the file where scores will be saved and loaded
-     * @throws NullPointerException if {@code filePath} is null
+     * Default constructor for application runtime.
      */
-    public ScoreManagerImpl(final String filePath) { // riceve dall'esterno il percorso del file
-        this.filePath = Path.of(filePath);
+    public ScoreManagerImpl() {
+        this(Path.of("scores.csv"));
     }
 
+    /**
+     * Constructor allowing a custom file path, used for isolated unit testing.
+     *
+     * @param filePath the path to the score file
+     */
+    public ScoreManagerImpl(final Path filePath) {
+        this.filePath = Objects.requireNonNull(filePath, "filePath cannot be null");
+    }
     // implementazione dei metodi
 
     /**
