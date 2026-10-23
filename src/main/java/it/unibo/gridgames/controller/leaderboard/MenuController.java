@@ -29,7 +29,7 @@ public class MenuController {
 
         final LeaderboardView leaderboardView = new LeaderboardView(); //pannello grafico per la classifica
         final LeaderBoardController leaderboardController = 
-            new LeaderBoardController();
+            new LeaderBoardController(scoreManager, view, leaderboardView);
 
         //carica i dati salvati e popola la vista della classifica
         leaderboardController.loadAndDisplayScores();
