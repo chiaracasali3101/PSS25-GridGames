@@ -1,6 +1,7 @@
 package it.unibo.gridgames.view.menu;
 
 import javafx.scene.layout.BorderPane;
+import it.unibo.gridgames.persistence.ScoreManager;
 import it.unibo.gridgames.view.UIConstants;
 import javafx.geometry.Insets;
 import javafx.scene.control.Button;

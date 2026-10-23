@@ -14,6 +14,7 @@ public class MenuController {
     private final MainAppView view;
     private final Scene scene; 
     private ScoreManager scoreManager = null;
+    
 
     /**
      * Construct Menu Controller 
@@ -37,7 +38,11 @@ public class MenuController {
         //configura il tasto 'Indietro' per ripristinare il menu principale
         leaderboardView.setOnBackSelected(() -> this.scene.setRoot(this.view));
 
-        //sostituisce la vista a schermo
-        this.scene.setRoot(leaderboardView);
+        this.view.setOnLeaderboardSelected(() -> {
+            leaderboardController.loadAndDisplayScores();
+            this.scene.setRoot(leaderboardView);
+        });
+        
+        this.scene.setRoot(this.view);
     }
 }   
