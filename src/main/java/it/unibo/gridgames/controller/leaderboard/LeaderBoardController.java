@@ -7,6 +7,7 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 
 import it.unibo.gridgames.model.score.GameRecordImpl;
+import it.unibo.gridgames.model.score.GameType;
 import it.unibo.gridgames.persistence.ScoreManager;
 import it.unibo.gridgames.view.menu.LeaderboardView;
 import it.unibo.gridgames.view.menu.MainAppView;
@@ -28,8 +29,10 @@ public class LeaderBoardController {
         try {
             final List<GameRecordImpl> scores = this.scoreManager.loadAllScores(); //prende i punteggi 
             final List<GameRecordImpl> sortedScores = scores.stream() //ordinamento con stream di java
+                .filter(record -> GameType.SUDOKU.equals(record.getGameType()))
                 .sorted(Comparator.comparingInt(GameRecordImpl::getScore).reversed())
                 .collect(Collectors.toList());
+                this.view.updateScores(sortedScores); //visualizza punteggio 
         } catch(final IOException e){
         }
     }
