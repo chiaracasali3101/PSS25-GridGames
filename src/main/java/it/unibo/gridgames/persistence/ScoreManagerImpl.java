@@ -2,7 +2,6 @@ package it.unibo.gridgames.persistence;
 
 import java.nio.file.Path;
 import java.util.Objects;
-import java.util.Locale;
 
 import it.unibo.gridgames.model.score.GameRecordImpl;
 import it.unibo.gridgames.model.score.GameType;
@@ -21,11 +20,6 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonPrimitive;
 import com.google.gson.JsonSerializer;
-import com.google.gson.reflect.TypeToken;
-import java.io.Reader;
-import java.io.Writer;
-import java.lang.reflect.Type;
-import java.nio.charset.StandardCharsets;
 
 /**
  * ScoreManagerImpl is a class that implements the ScoreManager interface and

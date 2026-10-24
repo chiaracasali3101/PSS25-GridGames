@@ -5,7 +5,6 @@ import javafx.scene.layout.BorderPane;
 import java.util.List;
 
 import it.unibo.gridgames.model.score.GameRecordImpl;
-import it.unibo.gridgames.persistence.ScoreManager;
 import it.unibo.gridgames.view.UIConstants;
 import javafx.geometry.Insets;
 import javafx.scene.control.Button;
@@ -15,9 +14,12 @@ import javafx.scene.control.ListView;
  * LeaderboardView represents the user interface for displaying the leaderboard of game scores.
  */
 
-public class LeaderboardView extends BorderPane {
+public final class LeaderboardView extends BorderPane {
     private final Button btnBack = new Button("Indietro");
     private final ListView<String> scoreListView = new ListView<>(); //campo lista grafica 
+
+    private static final double LIST_VERTICAL_MARGIN = 10.0;
+    private static final double LIST_HORIZONTAL_MARGIN = 20.0;
 
     /**
      * Constructs a new LeaderboardView instance and initializes the UI components.
@@ -30,7 +32,7 @@ public class LeaderboardView extends BorderPane {
 
         btnBack.setStyle("-fx-background-color: darkorange; -fx-text-fill: white; -fx-font-weight: bold;");
 
-        BorderPane.setMargin(this.scoreListView, new Insets(10, 20, 20, 20)); //visualizzazione punteggi
+        BorderPane.setMargin(this.scoreListView, new Insets(LIST_VERTICAL_MARGIN, LIST_HORIZONTAL_MARGIN, LIST_HORIZONTAL_MARGIN, LIST_HORIZONTAL_MARGIN)); //visualizzazione punteggi
         this.setCenter(this.scoreListView);
     }
 

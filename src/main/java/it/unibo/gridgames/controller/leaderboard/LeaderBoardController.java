@@ -14,26 +14,24 @@ import it.unibo.gridgames.view.menu.MainAppView;
 
 public class LeaderBoardController {
     
-    private ScoreManager scoreManager;
-    private LeaderboardView view;
+    private final ScoreManager scoreManager;
+    private final LeaderboardView view;
 
     public LeaderBoardController(final ScoreManager scoreManager, final MainAppView view2, LeaderboardView view) {
         this.scoreManager = Objects.requireNonNull(scoreManager, "ScoreManager cannot be null");
         this.view = Objects.requireNonNull(view, "LeaderboardView cannot be null");
-
-        this.scoreManager = scoreManager;
-        this.view = view;
     }
 
     public void loadAndDisplayScores() {
         try {
             final List<GameRecordImpl> scores = this.scoreManager.loadAllScores(); //prende i punteggi 
             final List<GameRecordImpl> sortedScores = scores.stream() //ordinamento con stream di java
-                .filter(record -> GameType.SUDOKU.equals(record.getGameType()))
+                .filter(record -> record.getGameType() == GameType.SUDOKU)
                 .sorted(Comparator.comparingInt(GameRecordImpl::getScore).reversed())
                 .collect(Collectors.toList());
                 this.view.updateScores(sortedScores); //visualizza punteggio 
         } catch(final IOException e){
+            
         }
     }
 

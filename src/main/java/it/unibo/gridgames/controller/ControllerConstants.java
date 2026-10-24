@@ -8,7 +8,7 @@ public enum ControllerConstants {
 
     WINDOW_WIDTH(500),
     WINDOW_HEIGHT(400);
-   
+
     private final int value;
 
     ControllerConstants(final int value) {
@@ -16,7 +16,7 @@ public enum ControllerConstants {
     }
 
     /**
-     * Returns the integer value associated with the controller constants
+     * Returns the integer value associated with the controller constants.
      * 
      * @return value 
      */

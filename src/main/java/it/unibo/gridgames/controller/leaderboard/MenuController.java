@@ -13,9 +13,8 @@ import javafx.scene.Scene;
 public class MenuController {
     private final MainAppView view;
     private final Scene scene; 
-    private ScoreManager scoreManager = null;
+    private final ScoreManager scoreManager;
     
-
     /**
      * Construct Menu Controller 
      * @param view view the main app view

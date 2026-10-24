@@ -32,7 +32,7 @@ public final class MainApp extends Application {
         view.setOnLeaderboardSelected(() -> {
             System.out.println("Apertura Classifics & Statistiche (Chiara)");
         });*/
-        
+
         stage.setTitle("GridGames");
         stage.setScene(scene);
         stage.show();
