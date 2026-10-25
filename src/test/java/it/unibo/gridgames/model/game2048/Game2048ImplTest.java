@@ -121,6 +121,97 @@ class Game2048ImplTest {
     }
 
     @Test
+    void reachingTheWinningTileWinsTheGame() {
+        final Game2048 game = new Game2048Impl(new int[][] {
+            {1024, 1024, 0, 0},
+            {0, 0, 0, 0},
+            {0, 0, 0, 0},
+            {0, 0, 0, 0},
+        }, new CountingSpawner());
+
+        game.move(Direction.LEFT);
+
+        assertEquals(GameState2048.WON, game.getState());
+    }
+
+    @Test
+    void gridWithTheWinningTileStartsAsWon() {
+        final Game2048 game = new Game2048Impl(new int[][] {
+            {2048, 0, 0, 0},
+            {0, 0, 0, 0},
+            {0, 0, 0, 0},
+            {0, 0, 0, 0},
+        }, new CountingSpawner());
+
+        assertEquals(GameState2048.WON, game.getState());
+    }
+
+    @Test
+    void noMoveIsAllowedAfterWinning() {
+        final Game2048 game = new Game2048Impl(new int[][] {
+            {2048, 0, 0, 2},
+            {0, 0, 0, 0},
+            {0, 0, 0, 0},
+            {0, 0, 0, 0},
+        }, new CountingSpawner());
+
+        assertFalse(game.move(Direction.LEFT));
+        assertEquals(0, game.getMoves());
+    }
+
+    @Test
+    void fillingTheLastCellWithoutMergesEndsTheGame() {
+        final Game2048 game = new Game2048Impl(new int[][] {
+            {0, 4, 2, 4},
+            {2, 4, 2, 4},
+            {4, 2, 4, 2},
+            {2, 4, 2, 4},
+        }, new CountingSpawner());
+
+        assertTrue(game.move(Direction.LEFT));
+
+        assertEquals(GameState2048.GAME_OVER, game.getState());
+        assertFalse(game.move(Direction.RIGHT));
+        assertEquals(1, game.getMoves());
+    }
+
+    @Test
+    void blockedGridStartsAsGameOver() {
+        final Game2048 game = new Game2048Impl(new int[][] {
+            {2, 4, 2, 4},
+            {4, 2, 4, 2},
+            {2, 4, 2, 4},
+            {4, 2, 4, 2},
+        }, new CountingSpawner());
+
+        assertEquals(GameState2048.GAME_OVER, game.getState());
+    }
+
+    @Test
+    void fullGridWithHorizontalPairIsNotOver() {
+        final Game2048 game = new Game2048Impl(new int[][] {
+            {2, 2, 4, 8},
+            {4, 8, 16, 32},
+            {8, 16, 32, 64},
+            {16, 32, 64, 128},
+        }, new CountingSpawner());
+
+        assertEquals(GameState2048.PLAYING, game.getState());
+    }
+
+    @Test
+    void fullGridWithVerticalPairIsNotOver() {
+        final Game2048 game = new Game2048Impl(new int[][] {
+            {2, 4, 2, 4},
+            {4, 2, 4, 2},
+            {2, 4, 2, 8},
+            {4, 2, 4, 8},
+        }, new CountingSpawner());
+
+        assertEquals(GameState2048.PLAYING, game.getState());
+    }
+
+    @Test
     void nullArgumentsAreRejected() {
         final Game2048 game = new Game2048Impl();
 
