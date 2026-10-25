@@ -19,10 +19,7 @@ public final class LineMergerImpl implements LineMerger {
         final IntStream.Builder result = IntStream.builder();
         int points = 0;
         int index = 0;
-        /*
-         * After a merge the index skips both tiles, so the new tile
-         * is never compared again: [4, 4, 8] becomes [8, 8], not [16].
-         */
+        // dopo una fusione salto entrambe le tessere, così [4, 4, 8] diventa [8, 8] e non [16]
         while (index < tiles.length) {
             if (index + 1 < tiles.length && tiles[index] == tiles[index + 1]) {
                 final int merged = tiles[index] * 2;
@@ -34,7 +31,6 @@ public final class LineMergerImpl implements LineMerger {
                 index++;
             }
         }
-        // copyOf pads the line with zeros up to its original length
         return new MergeResult(Arrays.copyOf(result.build().toArray(), line.length), points);
     }
 }

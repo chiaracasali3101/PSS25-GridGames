@@ -97,10 +97,7 @@ public final class BoardImpl implements Board {
         Objects.checkIndex(column, this.size);
     }
 
-    /*
-     * A tile value is valid if it is 0 (empty) or a power of two greater than 1:
-     * a power of two has exactly one bit set, so value & (value - 1) is 0.
-     */
+    // una potenza di 2 ha un solo bit a 1, quindi value & (value - 1) vale 0
     private static boolean isValidValue(final int value) {
         return value == EMPTY || value > 1 && (value & (value - 1)) == 0;
     }
