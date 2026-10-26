@@ -2,12 +2,10 @@ package it.unibo.gridgames.persistence;
 
 import java.nio.file.Path;
 import java.util.Objects;
-import java.util.Locale;
 
 import it.unibo.gridgames.model.score.GameRecordImpl;
 import it.unibo.gridgames.model.score.GameType;
 
-import java.io.BufferedWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.StandardOpenOption;
@@ -16,6 +14,12 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonDeserializer;
+import com.google.gson.JsonPrimitive;
+import com.google.gson.JsonSerializer;
 
 /**
  * ScoreManagerImpl is a class that implements the ScoreManager interface and
@@ -27,21 +31,26 @@ import java.util.stream.Collectors;
 
 public class ScoreManagerImpl implements ScoreManager {
     private static final String GAMETYPE_NO_NULL = "GameType cannot be null";
-
-    private static final int TIMESTAMP_INDEX = 5;
-
     private final Path filePath;
 
+    private final Gson gson = new GsonBuilder()
+        .registerTypeAdapter(LocalDateTime.class, (JsonSerializer<LocalDateTime>) 
+            (src, typeOfSrc, context) -> new JsonPrimitive(src.toString()))
+        .registerTypeAdapter(LocalDateTime.class, (JsonDeserializer<LocalDateTime>) 
+            (json, typeOfT, context) -> LocalDateTime.parse(json.getAsString()))
+        .setPrettyPrinting()
+        .create();
+
     /**
-     * Constructor for ScoreManagerImpl that takes a file path as a parameter.
-     * 
-     * @param filePath the path to the file where scores will be saved and loaded
-     * @throws NullPointerException if {@code filePath} is null
+     * Default constructor for application runtime.
      */
-    public ScoreManagerImpl(final String filePath) { // riceve dall'esterno il percorso del file
-        this.filePath = Path.of(filePath);
+    public ScoreManagerImpl() {
+        this(Path.of("scores.json"));
     }
 
+    public ScoreManagerImpl(final Path filePath) {
+        this.filePath = Objects.requireNonNull(filePath, "filePath cannot be null");
+    }
     // implementazione dei metodi
 
     /**
@@ -52,29 +61,23 @@ public class ScoreManagerImpl implements ScoreManager {
      * @throws IOException signals that an I/O exception of some sort has occurred
      */
     @Override
-    public final void saveScore(final GameRecordImpl record) throws IOException { // salvare il punteggio nel file
+    public final void saveScore(final GameRecordImpl record) throws IOException {
         synchronized (this) {
-
-            // controllo valori nulli
             Objects.requireNonNull(record, "Record cannot be null");
+            final List<GameRecordImpl> currentScores = new ArrayList<>(loadAllScores());
+            currentScores.add(record);
 
-            // logica per salvare il record nel file
-            final String playerName = record.getPlayerName();
-            final int score = record.getScore();
-            final String gameType = record.getGameType().name();
-            final int moves = record.getMoves();
-            final long durationSeconds = record.getDurationSeconds();
-            final LocalDateTime timestamp = record.getTimestamp();
+            if (this.filePath.getParent() != null) {
+                Files.createDirectories(this.filePath.getParent());
+            }
 
-            final String line = String.format("%s,%d,%s,%d,%d,%s%n", playerName, score, gameType, moves,
-                    durationSeconds, timestamp);
-
-            // scrittura nel file
-            try (BufferedWriter writer = Files.newBufferedWriter(
+            //sovrascrive json
+            try (var writer = Files.newBufferedWriter(
                     this.filePath,
+                    java.nio.charset.StandardCharsets.UTF_8,
                     StandardOpenOption.CREATE,
-                    StandardOpenOption.APPEND)) {
-                writer.write(line);
+                    StandardOpenOption.TRUNCATE_EXISTING)) {
+                this.gson.toJson(currentScores, writer);
             }
         }
     }
@@ -83,33 +86,14 @@ public class ScoreManagerImpl implements ScoreManager {
     // vuota
     @Override
     public final List<GameRecordImpl> loadAllScores() {
-        if (!Files.exists(this.filePath)) {
+        if (!Files.exists(this.filePath) || !Files.isRegularFile(this.filePath)) {
             return List.of();
         }
 
-        try {
-            final List<String> lines = Files.readAllLines(this.filePath);
-            final List<GameRecordImpl> records = new ArrayList<>();
-
-            for (final String line : lines) {
-                if (line.isBlank()) {
-                    continue;
-                }
-
-                final String[] tokens = line.split(",");
-                if (tokens.length >= PersistenceConstants.EXPECTED_FIELDS_COUNT.getValue()) {
-                    final String playerName = tokens[0].trim();
-                    final int score = Integer.parseInt(tokens[1].trim());
-                    final GameType gameType = GameType.valueOf(tokens[2].trim().toUpperCase(Locale.ROOT));
-                    final int moves = Integer.parseInt(tokens[3].trim());
-                    final long durationSeconds = Long.parseLong(tokens[4].trim());
-                    final LocalDateTime timestamp = LocalDateTime.parse(tokens[TIMESTAMP_INDEX].trim());
-                    final GameRecordImpl record = new GameRecordImpl(playerName, score, gameType, moves,
-                            durationSeconds, timestamp);
-                    records.add(record);
-                }
-            }
-            return List.copyOf(records);
+        try (var reader = Files.newBufferedReader(this.filePath, java.nio.charset.StandardCharsets.UTF_8)) {
+            final java.lang.reflect.Type listType = new com.google.gson.reflect.TypeToken<List<GameRecordImpl>>() { }.getType();
+            final List<GameRecordImpl> records = this.gson.fromJson(reader, listType);
+            return records != null ? List.copyOf(records) : List.of();
         } catch (final IOException e) {
             return List.of();
         }

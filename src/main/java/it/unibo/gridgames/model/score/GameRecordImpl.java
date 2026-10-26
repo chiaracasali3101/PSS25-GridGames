@@ -58,6 +58,7 @@ public class GameRecordImpl implements GameRecord {
      * 
      * @return the name of the player who played the game
      */
+    @Override 
     public final String getPlayerName() {
         return this.playerName;
     }
@@ -68,6 +69,7 @@ public class GameRecordImpl implements GameRecord {
      * 
      * @return the type of game that was played
      */
+    @Override 
     public final GameType getGameType() {
         return this.gameType;
     }
@@ -78,6 +80,7 @@ public class GameRecordImpl implements GameRecord {
      * 
      * @return the score achieved by the player in the game
      */
+    @Override 
     public final int getScore() {
         return this.score;
     }
@@ -88,6 +91,7 @@ public class GameRecordImpl implements GameRecord {
      * 
      * @return the number of moves made by the player in the game
      */
+    @Override 
     public final int getMoves() {
         return this.moves;
     }
@@ -98,6 +102,7 @@ public class GameRecordImpl implements GameRecord {
      * 
      * @return the duration of the game in seconds
      */
+    @Override 
     public final long getDurationSeconds() {
         return this.durationSeconds;
     }
@@ -108,6 +113,7 @@ public class GameRecordImpl implements GameRecord {
      * 
      * @return the timestamp of when the game was played
      */
+    @Override 
     public final LocalDateTime getTimestamp() {
         return this.timestamp;
     }

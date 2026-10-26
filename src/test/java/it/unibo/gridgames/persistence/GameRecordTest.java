@@ -1,4 +1,4 @@
-package it.unibo.gridgames;
+package it.unibo.gridgames.persistence;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
