@@ -1,0 +1,10 @@
+[
+  {
+    "playerName": "TestSudoku",
+    "score": 1500,
+    "gameType": "SUDOKU",
+    "moves": 24,
+    "durationSeconds": 180,
+    "timestamp": "2026-10-26T19:40:42.267218"
+  }
+]
