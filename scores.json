@@ -6,5 +6,21 @@
     "moves": 24,
     "durationSeconds": 180,
     "timestamp": "2026-10-26T19:40:42.267218"
+  },
+  {
+    "playerName": "TestSudoku",
+    "score": 1500,
+    "gameType": "SUDOKU",
+    "moves": 24,
+    "durationSeconds": 180,
+    "timestamp": "2026-10-31T10:05:01.349256"
+  },
+  {
+    "playerName": "TestSudoku",
+    "score": 2000,
+    "gameType": "SUDOKU",
+    "moves": 12,
+    "durationSeconds": 12,
+    "timestamp": "2026-10-31T10:05:01.357555"
   }
 ]

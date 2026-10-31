@@ -51,7 +51,7 @@ public class SudokuController {
 
         // --- SIMULAZIONE FINE PARTITA (da rimuovere dopo il test) ---
         this.saveGameRecord("TestSudoku", 1500, 24, 180L);
-        System.out.println("Punteggio di test salvato con successo!");
+        this.saveGameRecord("TestSudoku", 2000, 12, 12L);
     }
 
     /**

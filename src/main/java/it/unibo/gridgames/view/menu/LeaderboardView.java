@@ -4,6 +4,7 @@ import javafx.scene.layout.BorderPane;
 
 import java.util.List;
 
+import it.unibo.gridgames.model.score.GameRecord;
 import it.unibo.gridgames.model.score.GameRecordImpl;
 import it.unibo.gridgames.view.UIConstants;
 import javafx.geometry.Insets;
@@ -47,11 +48,19 @@ public final class LeaderboardView extends BorderPane {
 
     //ricevere punteggi
     public void updateScores(final List<GameRecordImpl> scores) {
-    this.scoreListView.getItems().clear();
-    for (final GameRecordImpl record : scores) {
-        this.scoreListView.getItems().add(
-            record.getPlayerName() + " - " + record.getScore() + " pt"
-        );
+        this.scoreListView.getItems().clear();
+
+        int rank = 1;
+        for (final GameRecordImpl record : scores) {
+            final String formattedDate = record.getDateTime().toLocalDate().toString();
+            final String labelText = String.format("#%d  -  %d pt  (%s, %d mosse)",
+                rank,
+                record.getScore(),
+                formattedDate,
+                record.getMoves()
+            );
+            this.scoreListView.getItems().add(labelText);
+            rank++;
+        }
     }
-}
 }

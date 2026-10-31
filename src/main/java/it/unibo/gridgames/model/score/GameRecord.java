@@ -49,5 +49,5 @@ public interface GameRecord {
      * 
      * @return timestamp of the game record
      */
-    LocalDateTime getTimestamp();
+    LocalDateTime getDateTime();
 }

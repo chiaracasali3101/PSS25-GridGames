@@ -114,7 +114,7 @@ public class GameRecordImpl implements GameRecord {
      * @return the timestamp of when the game was played
      */
     @Override 
-    public final LocalDateTime getTimestamp() {
+    public final LocalDateTime getDateTime() {
         return this.timestamp;
     }
 

@@ -23,17 +23,14 @@ public class LeaderBoardController {
     }
 
     public void loadAndDisplayScores() {
-        try {
-            final List<GameRecordImpl> scores = this.scoreManager.loadAllScores(); //prende i punteggi 
-            final List<GameRecordImpl> sortedScores = scores.stream() //ordinamento con stream di java
-                .filter(record -> record.getGameType() == GameType.SUDOKU)
-                .sorted(Comparator.comparingInt(GameRecordImpl::getScore).reversed())
-                .collect(Collectors.toList());
-                this.view.updateScores(sortedScores); //visualizza punteggio 
-        } catch(final IOException e){
-            
-        }
-    }
+        final List<GameRecordImpl> allScores = this.scoreManager.loadAllScores();
+        final List<GameRecordImpl> top5Scores = allScores.stream()
+            .filter(record -> record.getGameType() == GameType.SUDOKU)
+            .sorted(Comparator.comparingInt(GameRecordImpl::getScore).reversed())
+            .limit(5)
+            .toList();
+            this.view.updateScores(top5Scores);
+    }   
 
     public LeaderboardView getView() {
         return this.view;
