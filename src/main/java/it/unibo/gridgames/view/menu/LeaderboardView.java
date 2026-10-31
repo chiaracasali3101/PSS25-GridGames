@@ -4,7 +4,6 @@ import javafx.scene.layout.BorderPane;
 
 import java.util.List;
 
-import it.unibo.gridgames.model.score.GameRecord;
 import it.unibo.gridgames.model.score.GameRecordImpl;
 import it.unibo.gridgames.view.UIConstants;
 import javafx.geometry.Insets;
@@ -16,11 +15,11 @@ import javafx.scene.control.ListView;
  */
 
 public final class LeaderboardView extends BorderPane {
-    private final Button btnBack = new Button("Indietro");
-    private final ListView<String> scoreListView = new ListView<>(); //campo lista grafica 
-
     private static final double LIST_VERTICAL_MARGIN = 10.0;
     private static final double LIST_HORIZONTAL_MARGIN = 20.0;
+
+    private final Button btnBack = new Button("Indietro");
+    private final ListView<String> scoreListView = new ListView<>(); //campo lista grafica 
 
     /**
      * Constructs a new LeaderboardView instance and initializes the UI components.
@@ -33,7 +32,10 @@ public final class LeaderboardView extends BorderPane {
 
         btnBack.setStyle("-fx-background-color: darkorange; -fx-text-fill: white; -fx-font-weight: bold;");
 
-        BorderPane.setMargin(this.scoreListView, new Insets(LIST_VERTICAL_MARGIN, LIST_HORIZONTAL_MARGIN, LIST_HORIZONTAL_MARGIN, LIST_HORIZONTAL_MARGIN)); //visualizzazione punteggi
+        BorderPane.setMargin(this.scoreListView, new Insets(LIST_VERTICAL_MARGIN, 
+            LIST_HORIZONTAL_MARGIN, 
+            LIST_HORIZONTAL_MARGIN, 
+            LIST_HORIZONTAL_MARGIN)); //visualizzazione punteggi
         this.setCenter(this.scoreListView);
     }
 
@@ -46,8 +48,12 @@ public final class LeaderboardView extends BorderPane {
         this.btnBack.setOnAction(e -> handler.run());
     }
 
-    //ricevere punteggi
-    public void updateScores(final List<GameRecordImpl> scores) {
+    /**
+     * Update score.
+     * 
+     * @param scores update 
+     */
+    public void updateScores(final List<GameRecordImpl> scores) { //ricevere punteggi
         this.scoreListView.getItems().clear();
 
         int rank = 1;

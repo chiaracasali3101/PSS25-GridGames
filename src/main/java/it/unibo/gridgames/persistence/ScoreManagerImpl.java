@@ -48,6 +48,11 @@ public class ScoreManagerImpl implements ScoreManager {
         this(Path.of("scores.json"));
     }
 
+    /**
+     * View Score.
+     * 
+     * @param filePath score
+     */
     public ScoreManagerImpl(final Path filePath) {
         this.filePath = Objects.requireNonNull(filePath, "filePath cannot be null");
     }
