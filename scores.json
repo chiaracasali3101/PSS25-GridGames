@@ -22,5 +22,53 @@
     "moves": 12,
     "durationSeconds": 12,
     "timestamp": "2026-10-31T10:05:01.357555"
+  },
+  {
+    "playerName": "TestSudoku",
+    "score": 1500,
+    "gameType": "SUDOKU",
+    "moves": 24,
+    "durationSeconds": 180,
+    "timestamp": "2026-10-31T14:15:11.214146"
+  },
+  {
+    "playerName": "TestSudoku",
+    "score": 2000,
+    "gameType": "SUDOKU",
+    "moves": 12,
+    "durationSeconds": 12,
+    "timestamp": "2026-10-31T14:15:11.221873"
+  },
+  {
+    "playerName": "TestSudoku",
+    "score": 1500,
+    "gameType": "SUDOKU",
+    "moves": 24,
+    "durationSeconds": 180,
+    "timestamp": "2026-10-31T14:15:12.197512"
+  },
+  {
+    "playerName": "TestSudoku",
+    "score": 2000,
+    "gameType": "SUDOKU",
+    "moves": 12,
+    "durationSeconds": 12,
+    "timestamp": "2026-10-31T14:15:12.201033"
+  },
+  {
+    "playerName": "TestSudoku",
+    "score": 1500,
+    "gameType": "SUDOKU",
+    "moves": 24,
+    "durationSeconds": 180,
+    "timestamp": "2026-10-31T14:15:12.747152"
+  },
+  {
+    "playerName": "TestSudoku",
+    "score": 2000,
+    "gameType": "SUDOKU",
+    "moves": 12,
+    "durationSeconds": 12,
+    "timestamp": "2026-10-31T14:15:12.750585"
   }
 ]

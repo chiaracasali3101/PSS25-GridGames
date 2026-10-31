@@ -9,6 +9,8 @@ import it.unibo.gridgames.model.score.GameRecordImpl;
 import it.unibo.gridgames.model.score.GameType;
 import it.unibo.gridgames.persistence.ScoreManager;
 import it.unibo.gridgames.view.menu.LeaderboardView;
+import java.util.ArrayList;
+import it.unibo.gridgames.model.score.GameType;
 
 /**
  * Controller responsible for managing and displaying the leaderboard.
@@ -34,13 +36,22 @@ public final class LeaderBoardController {
      * and updates the view with the results.
      */
     public void loadAndDisplayScores() {
+        this.view.setTitle("Classifica Generale");
+
         final List<GameRecordImpl> allScores = this.scoreManager.loadAllScores();
-        final List<GameRecordImpl> top5Scores = allScores.stream()
-            .filter(record -> record.getGameType() == GameType.SUDOKU)
-            .sorted(Comparator.comparingInt(GameRecordImpl::getScore).reversed())
-            .limit(ControllerConstants.MAX_SIZE.getValue())
-            .toList();
-            this.view.updateScores(top5Scores);
+        final List<GameRecordImpl> topScoresAllGames = new ArrayList<>();
+
+        for (final GameType type : GameType.values()) {
+            final List<GameRecordImpl> topPerGame = allScores.stream()
+                .filter(record -> record.getGameType() == type)
+                .sorted(Comparator.comparingInt(GameRecordImpl::getScore).reversed())
+                .limit(5)
+                .toList();
+
+            topScoresAllGames.addAll(topPerGame);
+        }
+
+        this.view.updateScores(topScoresAllGames);
     }
 
     /**
