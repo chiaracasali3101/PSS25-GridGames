@@ -8,6 +8,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.Arrays;
 import java.util.Optional;
+import java.util.Random;
 
 import org.junit.jupiter.api.Test;
 
@@ -17,6 +18,8 @@ class Game2048ImplTest {
     private static final int TWO = 2;
     private static final int FOUR = 4;
     private static final int EIGHT = 8;
+    private static final int WINNING_TILE = 2048;
+    private static final long SEED = 2048L;
 
     @Test
     void newGameStartsWithTwoTiles() {
@@ -209,6 +212,101 @@ class Game2048ImplTest {
         }, new CountingSpawner());
 
         assertEquals(GameState2048.PLAYING, game.getState());
+    }
+
+    @Test
+    void winningTakesPriorityOverABlockedGrid() {
+        final Game2048 game = new Game2048Impl(new int[][] {
+            {2048, 4, 2, 4},
+            {4, 2, 4, 2},
+            {2, 4, 2, 4},
+            {4, 2, 4, 2},
+        }, new CountingSpawner());
+
+        assertEquals(GameState2048.WON, game.getState());
+    }
+
+    @Test
+    void winningMoveIsCountedAndScored() {
+        final CountingSpawner spawner = new CountingSpawner();
+        final Game2048 game = new Game2048Impl(new int[][] {
+            {1024, 1024, 0, 0},
+            {0, 0, 0, 0},
+            {0, 0, 0, 0},
+            {0, 0, 0, 0},
+        }, spawner);
+
+        assertTrue(game.move(Direction.LEFT));
+
+        assertEquals(WINNING_TILE, game.getScore());
+        assertEquals(1, game.getMoves());
+        assertEquals(1, spawner.calls);
+    }
+
+    @Test
+    void mergeOnFullGridThatLeavesAPairKeepsPlaying() {
+        final Game2048 game = new Game2048Impl(new int[][] {
+            {2, 2, 4, 8},
+            {4, 8, 16, 32},
+            {8, 16, 32, 64},
+            {16, 32, 64, 128},
+        }, new CountingSpawner());
+
+        assertTrue(game.move(Direction.LEFT));
+
+        assertArrayEquals(new int[] {4, 4, 8, 2}, game.getGrid()[0]);
+        assertEquals(FOUR, game.getScore());
+        assertEquals(GameState2048.PLAYING, game.getState());
+    }
+
+    @Test
+    void mergeOnFullGridThatLeavesNoPairEndsTheGame() {
+        final Game2048 game = new Game2048Impl(new int[][] {
+            {2, 2, 8, 16},
+            {8, 16, 32, 64},
+            {16, 32, 64, 128},
+            {32, 64, 128, 256},
+        }, new CountingSpawner());
+
+        assertTrue(game.move(Direction.LEFT));
+
+        assertArrayEquals(new int[] {4, 8, 16, 2}, game.getGrid()[0]);
+        assertEquals(FOUR, game.getScore());
+        assertEquals(GameState2048.GAME_OVER, game.getState());
+    }
+
+    @Test
+    void invalidMoveAfterAValidOneKeepsCounters() {
+        final CountingSpawner spawner = new CountingSpawner();
+        final Game2048 game = new Game2048Impl(new int[][] {
+            {2, 4, 0, 0},
+            {0, 0, 0, 0},
+            {0, 0, 0, 0},
+            {0, 0, 0, 0},
+        }, spawner);
+
+        assertTrue(game.move(Direction.RIGHT));
+        assertFalse(game.move(Direction.UP));
+
+        assertEquals(1, game.getMoves());
+        assertEquals(1, spawner.calls);
+        assertEquals(0, game.getScore());
+    }
+
+    @Test
+    void fullRandomGameEndsAndKeepsTheTileSumConsistent() {
+        final Game2048 game = new Game2048Impl(new TileSpawnerImpl(new Random(SEED)));
+
+        while (game.getState() == GameState2048.PLAYING) {
+            for (final Direction direction : Direction.values()) {
+                game.move(direction);
+            }
+            final int spawnedTiles = game.getMoves() + TWO;
+            final int sum = Arrays.stream(game.getGrid()).flatMapToInt(Arrays::stream).sum();
+            assertTrue(sum >= TWO * spawnedTiles && sum <= FOUR * spawnedTiles);
+        }
+
+        assertTrue(game.getMoves() > 0);
     }
 
     @Test
