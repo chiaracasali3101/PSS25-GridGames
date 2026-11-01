@@ -5,9 +5,9 @@ import java.util.Objects;
 import java.util.Optional;
 
 /**
- * Implementation of {@link Game2048} on a 4x4 board. The match is won as soon as
- * a 2048 tile appears and is lost when no move can change the grid; in both
- * cases no further move is accepted.
+ * Implementation of {@link Game2048} on a square board, 4x4 for a new match.
+ * The match is won as soon as a 2048 tile appears and is lost when no move can
+ * change the grid; in both cases no further move is accepted.
  */
 public final class Game2048Impl implements Game2048 {
 
@@ -20,7 +20,6 @@ public final class Game2048Impl implements Game2048 {
     private Board board;
     private int score;
     private int moves;
-    private GameState2048 state;
     private Optional<Snapshot> undoPoint = Optional.empty();
 
     /**
@@ -40,7 +39,6 @@ public final class Game2048Impl implements Game2048 {
         for (int i = 0; i < INITIAL_TILES; i++) {
             this.spawner.spawn(this.board);
         }
-        this.state = computeState();
     }
 
     /**
@@ -54,13 +52,12 @@ public final class Game2048Impl implements Game2048 {
     public Game2048Impl(final int[][] grid, final TileSpawner spawner) {
         this.board = new BoardImpl(grid);
         this.spawner = Objects.requireNonNull(spawner);
-        this.state = computeState();
     }
 
     @Override
     public boolean move(final Direction direction) {
         Objects.requireNonNull(direction);
-        if (this.state != GameState2048.PLAYING) {
+        if (getState() != GameState2048.PLAYING) {
             return false;
         }
         final Snapshot beforeMove = new Snapshot(new BoardImpl(this.board.toMatrix()), this.score, this.moves);
@@ -70,14 +67,13 @@ public final class Game2048Impl implements Game2048 {
             this.score += result.points();
             this.moves++;
             this.spawner.spawn(this.board);
-            this.state = computeState();
         }
         return result.changed();
     }
 
     @Override
     public boolean undo() {
-        if (this.state != GameState2048.PLAYING || this.undoPoint.isEmpty()) {
+        if (getState() != GameState2048.PLAYING || this.undoPoint.isEmpty()) {
             return false;
         }
         final Snapshot snapshot = this.undoPoint.get();
@@ -105,10 +101,6 @@ public final class Game2048Impl implements Game2048 {
 
     @Override
     public GameState2048 getState() {
-        return this.state;
-    }
-
-    private GameState2048 computeState() {
         final int[][] grid = this.board.toMatrix();
         if (Arrays.stream(grid).flatMapToInt(Arrays::stream).anyMatch(value -> value >= WINNING_TILE)) {
             return GameState2048.WON;

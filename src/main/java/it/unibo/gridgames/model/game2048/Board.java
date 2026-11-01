@@ -37,16 +37,6 @@ public interface Board {
     void setValue(int row, int column, int value);
 
     /**
-     * Tells whether a cell contains no tile.
-     *
-     * @param row the row index
-     * @param column the column index
-     * @return true if the cell is empty
-     * @throws IndexOutOfBoundsException if the cell is outside the board
-     */
-    boolean isEmpty(int row, int column);
-
-    /**
      * Returns the coordinates of all empty cells, in row-major order.
      *
      * @return an unmodifiable list of empty cell coordinates

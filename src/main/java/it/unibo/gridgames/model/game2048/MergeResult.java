@@ -12,14 +12,9 @@ public record MergeResult(int[] line, int points) {
 
     /**
      * Creates a new result. The line is copied.
-     *
-     * @throws IllegalArgumentException if points is negative
      */
     public MergeResult {
         line = Objects.requireNonNull(line).clone();
-        if (points < 0) {
-            throw new IllegalArgumentException("Points cannot be negative");
-        }
     }
 
     /**

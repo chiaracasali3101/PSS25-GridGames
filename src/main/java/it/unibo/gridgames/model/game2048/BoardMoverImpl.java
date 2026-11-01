@@ -11,23 +11,7 @@ import java.util.stream.IntStream;
  */
 public final class BoardMoverImpl implements BoardMover {
 
-    private final LineMerger merger;
-
-    /**
-     * Creates a mover that uses the standard 2048 merging rules.
-     */
-    public BoardMoverImpl() {
-        this(new LineMergerImpl());
-    }
-
-    /**
-     * Creates a mover that uses the given merging rules.
-     *
-     * @param merger the strategy used to slide and merge a single line
-     */
-    public BoardMoverImpl(final LineMerger merger) {
-        this.merger = Objects.requireNonNull(merger);
-    }
+    private final LineMerger merger = new LineMergerImpl();
 
     @Override
     public MoveResult move(final Board board, final Direction direction) {

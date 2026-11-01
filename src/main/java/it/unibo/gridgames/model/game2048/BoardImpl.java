@@ -68,11 +68,6 @@ public final class BoardImpl implements Board {
     }
 
     @Override
-    public boolean isEmpty(final int row, final int column) {
-        return getValue(row, column) == EMPTY;
-    }
-
-    @Override
     public List<Coordinate> getEmptyCells() {
         return IntStream.range(0, this.size * this.size)
             .mapToObj(index -> new Coordinate(index / this.size, index % this.size))
@@ -87,18 +82,12 @@ public final class BoardImpl implements Board {
             .toArray(int[][]::new);
     }
 
-    @Override
-    public String toString() {
-        return Arrays.deepToString(this.cells);
-    }
-
     private void checkBounds(final int row, final int column) {
         Objects.checkIndex(row, this.size);
         Objects.checkIndex(column, this.size);
     }
 
-    // una potenza di 2 ha un solo bit a 1, quindi value & (value - 1) vale 0
     private static boolean isValidValue(final int value) {
-        return value == EMPTY || value > 1 && (value & (value - 1)) == 0;
+        return value == EMPTY || value > 1 && Integer.bitCount(value) == 1;
     }
 }
