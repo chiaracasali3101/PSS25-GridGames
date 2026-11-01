@@ -310,6 +310,120 @@ class Game2048ImplTest {
     }
 
     @Test
+    void undoRestoresGridScoreAndMoves() {
+        final int[][] grid = {
+            {2, 2, 4, 0},
+            {0, 0, 0, 0},
+            {0, 0, 0, 0},
+            {0, 0, 0, 0},
+        };
+        final Game2048 game = new Game2048Impl(grid, new CountingSpawner());
+        game.move(Direction.LEFT);
+
+        assertTrue(game.undo());
+
+        assertArrayEquals(grid, game.getGrid());
+        assertEquals(0, game.getScore());
+        assertEquals(0, game.getMoves());
+    }
+
+    @Test
+    void undoWithoutMovesDoesNothing() {
+        final int[][] grid = new int[SIZE][SIZE];
+        final Game2048 game = new Game2048Impl(grid, new CountingSpawner());
+
+        assertFalse(game.undo());
+
+        assertArrayEquals(grid, game.getGrid());
+    }
+
+    @Test
+    void undoGoesBackOnlyOneMove() {
+        final Game2048 game = new Game2048Impl(new int[][] {
+            {2, 2, 4, 0},
+            {0, 0, 0, 0},
+            {0, 0, 0, 0},
+            {0, 0, 0, 0},
+        }, new CountingSpawner());
+        game.move(Direction.LEFT);
+        game.move(Direction.LEFT);
+
+        assertTrue(game.undo());
+        assertFalse(game.undo());
+
+        assertEquals(FOUR, game.getScore());
+        assertEquals(1, game.getMoves());
+    }
+
+    @Test
+    void invalidMoveDoesNotReplaceTheUndoPoint() {
+        final int[][] grid = {
+            {2, 4, 0, 0},
+            {0, 0, 0, 0},
+            {0, 0, 0, 0},
+            {0, 0, 0, 0},
+        };
+        final Game2048 game = new Game2048Impl(grid, new CountingSpawner());
+        game.move(Direction.RIGHT);
+        game.move(Direction.UP);
+
+        assertTrue(game.undo());
+
+        assertArrayEquals(grid, game.getGrid());
+    }
+
+    @Test
+    void gameCanContinueAfterUndo() {
+        final CountingSpawner spawner = new CountingSpawner();
+        final Game2048 game = new Game2048Impl(new int[][] {
+            {0, 0, 0, 2},
+            {0, 0, 0, 0},
+            {0, 0, 0, 0},
+            {0, 0, 0, 0},
+        }, spawner);
+        game.move(Direction.LEFT);
+        game.undo();
+
+        assertTrue(game.move(Direction.LEFT));
+
+        assertEquals(1, game.getMoves());
+        assertEquals(TWO, spawner.calls);
+        assertTrue(game.undo());
+    }
+
+    @Test
+    void undoIsNotAllowedAfterWinning() {
+        final Game2048 game = new Game2048Impl(new int[][] {
+            {1024, 1024, 0, 0},
+            {0, 0, 0, 0},
+            {0, 0, 0, 0},
+            {0, 0, 0, 0},
+        }, new CountingSpawner());
+        game.move(Direction.LEFT);
+
+        assertFalse(game.undo());
+
+        assertEquals(GameState2048.WON, game.getState());
+        assertEquals(WINNING_TILE, game.getScore());
+    }
+
+    @Test
+    void undoIsNotAllowedAfterGameOver() {
+        final Game2048 game = new Game2048Impl(new int[][] {
+            {0, 4, 2, 4},
+            {2, 4, 2, 4},
+            {4, 2, 4, 2},
+            {2, 4, 2, 4},
+        }, new CountingSpawner());
+        game.move(Direction.LEFT);
+
+        assertFalse(game.undo());
+
+        assertEquals(GameState2048.GAME_OVER, game.getState());
+        assertEquals(1, game.getMoves());
+    }
+
+    @Test
     void nullArgumentsAreRejected() {
         final Game2048 game = new Game2048Impl();
 
