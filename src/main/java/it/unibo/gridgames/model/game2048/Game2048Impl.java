@@ -2,6 +2,7 @@ package it.unibo.gridgames.model.game2048;
 
 import java.util.Arrays;
 import java.util.Objects;
+import java.util.Optional;
 
 /**
  * Implementation of {@link Game2048} on a 4x4 board. The match is won as soon as
@@ -14,12 +15,13 @@ public final class Game2048Impl implements Game2048 {
     private static final int INITIAL_TILES = 2;
     private static final int WINNING_TILE = 2048;
 
-    private final Board board;
     private final TileSpawner spawner;
     private final BoardMover mover = new BoardMoverImpl();
+    private Board board;
     private int score;
     private int moves;
     private GameState2048 state;
+    private Optional<Snapshot> undoPoint = Optional.empty();
 
     /**
      * Creates a new match with two random tiles.
@@ -61,14 +63,29 @@ public final class Game2048Impl implements Game2048 {
         if (this.state != GameState2048.PLAYING) {
             return false;
         }
+        final Snapshot beforeMove = new Snapshot(new BoardImpl(this.board.toMatrix()), this.score, this.moves);
         final MoveResult result = this.mover.move(this.board, direction);
         if (result.changed()) {
+            this.undoPoint = Optional.of(beforeMove);
             this.score += result.points();
             this.moves++;
             this.spawner.spawn(this.board);
             this.state = computeState();
         }
         return result.changed();
+    }
+
+    @Override
+    public boolean undo() {
+        if (this.state != GameState2048.PLAYING || this.undoPoint.isEmpty()) {
+            return false;
+        }
+        final Snapshot snapshot = this.undoPoint.get();
+        this.board = snapshot.board();
+        this.score = snapshot.score();
+        this.moves = snapshot.moves();
+        this.undoPoint = Optional.empty();
+        return true;
     }
 
     @Override
@@ -116,4 +133,13 @@ public final class Game2048Impl implements Game2048 {
         }
         return false;
     }
+
+    /**
+     * Memento of the match taken before a move.
+     *
+     * @param board a private copy of the board
+     * @param score the score before the move
+     * @param moves the move counter before the move
+     */
+    private record Snapshot(Board board, int score, int moves) { }
 }

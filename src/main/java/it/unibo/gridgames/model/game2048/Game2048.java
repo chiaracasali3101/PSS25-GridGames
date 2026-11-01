@@ -16,6 +16,14 @@ public interface Game2048 {
     boolean move(Direction direction);
 
     /**
+     * Takes back the last valid move, restoring grid, score and move counter.
+     * Only one move can be taken back, and only while the match is in progress.
+     *
+     * @return true if the move was taken back
+     */
+    boolean undo();
+
+    /**
      * Returns a copy of the grid indexed by [row][column], where 0 means empty.
      *
      * @return the current cell values
