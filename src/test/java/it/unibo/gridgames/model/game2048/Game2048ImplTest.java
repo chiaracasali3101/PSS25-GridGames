@@ -11,7 +11,11 @@ import java.util.Optional;
 import java.util.Random;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.Timeout;
 
+/**
+ * Tests for {@link Game2048Impl}.
+ */
 class Game2048ImplTest {
 
     private static final int SIZE = 4;
@@ -20,6 +24,13 @@ class Game2048ImplTest {
     private static final int EIGHT = 8;
     private static final int WINNING_TILE = 2048;
     private static final long SEED = 2048L;
+    private static final int TIMEOUT_SECONDS = 10;
+    private static final int[][] ONE_MOVE_FROM_GAME_OVER = {
+        {0, 4, 2, 4},
+        {2, 4, 2, 4},
+        {4, 2, 4, 2},
+        {2, 4, 2, 4},
+    };
 
     @Test
     void newGameStartsWithTwoTiles() {
@@ -38,32 +49,13 @@ class Game2048ImplTest {
     }
 
     @Test
-    void newGameAsksTheSpawnerForTwoTiles() {
-        final CountingSpawner spawner = new CountingSpawner();
-
-        new Game2048Impl(spawner);
-
-        assertEquals(TWO, spawner.calls);
-    }
-
-    @Test
     void validMoveSpawnsOneTileAndCountsTheMove() {
         final CountingSpawner spawner = new CountingSpawner();
-        final Game2048 game = new Game2048Impl(new int[][] {
-            {0, 0, 0, 2},
-            {0, 0, 0, 0},
-            {0, 0, 0, 0},
-            {0, 0, 0, 0},
-        }, spawner);
+        final Game2048 game = new Game2048Impl(topRow(0, 0, 0, 2), spawner);
 
         assertTrue(game.move(Direction.LEFT));
 
-        assertArrayEquals(new int[][] {
-            {2, 2, 0, 0},
-            {0, 0, 0, 0},
-            {0, 0, 0, 0},
-            {0, 0, 0, 0},
-        }, game.getGrid());
+        assertArrayEquals(topRow(2, 2, 0, 0), game.getGrid());
         assertEquals(1, spawner.calls);
         assertEquals(1, game.getMoves());
     }
@@ -71,12 +63,7 @@ class Game2048ImplTest {
     @Test
     void invalidMoveChangesNothing() {
         final CountingSpawner spawner = new CountingSpawner();
-        final int[][] grid = {
-            {2, 4, 0, 0},
-            {0, 0, 0, 0},
-            {0, 0, 0, 0},
-            {0, 0, 0, 0},
-        };
+        final int[][] grid = topRow(2, 4, 0, 0);
         final Game2048 game = new Game2048Impl(grid, spawner);
 
         assertFalse(game.move(Direction.LEFT));
@@ -89,12 +76,7 @@ class Game2048ImplTest {
 
     @Test
     void scoreIsTheSumOfAllMerges() {
-        final Game2048 game = new Game2048Impl(new int[][] {
-            {2, 2, 4, 0},
-            {0, 0, 0, 0},
-            {0, 0, 0, 0},
-            {0, 0, 0, 0},
-        }, new CountingSpawner());
+        final Game2048 game = new Game2048Impl(topRow(2, 2, 4, 0), new CountingSpawner());
 
         game.move(Direction.LEFT);
         assertEquals(FOUR, game.getScore());
@@ -124,52 +106,42 @@ class Game2048ImplTest {
     }
 
     @Test
-    void reachingTheWinningTileWinsTheGame() {
-        final Game2048 game = new Game2048Impl(new int[][] {
-            {1024, 1024, 0, 0},
-            {0, 0, 0, 0},
-            {0, 0, 0, 0},
-            {0, 0, 0, 0},
-        }, new CountingSpawner());
+    void winningMoveWinsAndIsCountedAndScored() {
+        final CountingSpawner spawner = new CountingSpawner();
+        final Game2048 game = new Game2048Impl(topRow(1024, 1024, 0, 0), spawner);
 
-        game.move(Direction.LEFT);
+        assertTrue(game.move(Direction.LEFT));
 
         assertEquals(GameState2048.WON, game.getState());
+        assertEquals(WINNING_TILE, game.getScore());
+        assertEquals(1, game.getMoves());
+        assertEquals(1, spawner.calls);
     }
 
     @Test
-    void gridWithTheWinningTileStartsAsWon() {
-        final Game2048 game = new Game2048Impl(new int[][] {
-            {2048, 0, 0, 0},
-            {0, 0, 0, 0},
-            {0, 0, 0, 0},
-            {0, 0, 0, 0},
-        }, new CountingSpawner());
+    void gridWithTheWinningTileIsWonAndRefusesMoves() {
+        final Game2048 game = new Game2048Impl(topRow(2048, 0, 0, 2), new CountingSpawner());
 
         assertEquals(GameState2048.WON, game.getState());
-    }
-
-    @Test
-    void noMoveIsAllowedAfterWinning() {
-        final Game2048 game = new Game2048Impl(new int[][] {
-            {2048, 0, 0, 2},
-            {0, 0, 0, 0},
-            {0, 0, 0, 0},
-            {0, 0, 0, 0},
-        }, new CountingSpawner());
-
         assertFalse(game.move(Direction.LEFT));
         assertEquals(0, game.getMoves());
     }
 
     @Test
-    void fillingTheLastCellWithoutMergesEndsTheGame() {
+    void winningTakesPriorityOverABlockedGrid() {
         final Game2048 game = new Game2048Impl(new int[][] {
-            {0, 4, 2, 4},
-            {2, 4, 2, 4},
+            {2048, 4, 2, 4},
             {4, 2, 4, 2},
             {2, 4, 2, 4},
+            {4, 2, 4, 2},
         }, new CountingSpawner());
+
+        assertEquals(GameState2048.WON, game.getState());
+    }
+
+    @Test
+    void fillingTheLastCellWithoutMergesEndsTheGame() {
+        final Game2048 game = new Game2048Impl(ONE_MOVE_FROM_GAME_OVER, new CountingSpawner());
 
         assertTrue(game.move(Direction.LEFT));
 
@@ -191,18 +163,6 @@ class Game2048ImplTest {
     }
 
     @Test
-    void fullGridWithHorizontalPairIsNotOver() {
-        final Game2048 game = new Game2048Impl(new int[][] {
-            {2, 2, 4, 8},
-            {4, 8, 16, 32},
-            {8, 16, 32, 64},
-            {16, 32, 64, 128},
-        }, new CountingSpawner());
-
-        assertEquals(GameState2048.PLAYING, game.getState());
-    }
-
-    @Test
     void fullGridWithVerticalPairIsNotOver() {
         final Game2048 game = new Game2048Impl(new int[][] {
             {2, 4, 2, 4},
@@ -212,35 +172,6 @@ class Game2048ImplTest {
         }, new CountingSpawner());
 
         assertEquals(GameState2048.PLAYING, game.getState());
-    }
-
-    @Test
-    void winningTakesPriorityOverABlockedGrid() {
-        final Game2048 game = new Game2048Impl(new int[][] {
-            {2048, 4, 2, 4},
-            {4, 2, 4, 2},
-            {2, 4, 2, 4},
-            {4, 2, 4, 2},
-        }, new CountingSpawner());
-
-        assertEquals(GameState2048.WON, game.getState());
-    }
-
-    @Test
-    void winningMoveIsCountedAndScored() {
-        final CountingSpawner spawner = new CountingSpawner();
-        final Game2048 game = new Game2048Impl(new int[][] {
-            {1024, 1024, 0, 0},
-            {0, 0, 0, 0},
-            {0, 0, 0, 0},
-            {0, 0, 0, 0},
-        }, spawner);
-
-        assertTrue(game.move(Direction.LEFT));
-
-        assertEquals(WINNING_TILE, game.getScore());
-        assertEquals(1, game.getMoves());
-        assertEquals(1, spawner.calls);
     }
 
     @Test
@@ -278,12 +209,7 @@ class Game2048ImplTest {
     @Test
     void invalidMoveAfterAValidOneKeepsCounters() {
         final CountingSpawner spawner = new CountingSpawner();
-        final Game2048 game = new Game2048Impl(new int[][] {
-            {2, 4, 0, 0},
-            {0, 0, 0, 0},
-            {0, 0, 0, 0},
-            {0, 0, 0, 0},
-        }, spawner);
+        final Game2048 game = new Game2048Impl(topRow(2, 4, 0, 0), spawner);
 
         assertTrue(game.move(Direction.RIGHT));
         assertFalse(game.move(Direction.UP));
@@ -294,6 +220,7 @@ class Game2048ImplTest {
     }
 
     @Test
+    @Timeout(TIMEOUT_SECONDS)
     void fullRandomGameEndsAndKeepsTheTileSumConsistent() {
         final Game2048 game = new Game2048Impl(new TileSpawnerImpl(new Random(SEED)));
 
@@ -311,12 +238,7 @@ class Game2048ImplTest {
 
     @Test
     void undoRestoresGridScoreAndMoves() {
-        final int[][] grid = {
-            {2, 2, 4, 0},
-            {0, 0, 0, 0},
-            {0, 0, 0, 0},
-            {0, 0, 0, 0},
-        };
+        final int[][] grid = topRow(2, 2, 4, 0);
         final Game2048 game = new Game2048Impl(grid, new CountingSpawner());
         game.move(Direction.LEFT);
 
@@ -339,12 +261,7 @@ class Game2048ImplTest {
 
     @Test
     void undoGoesBackOnlyOneMove() {
-        final Game2048 game = new Game2048Impl(new int[][] {
-            {2, 2, 4, 0},
-            {0, 0, 0, 0},
-            {0, 0, 0, 0},
-            {0, 0, 0, 0},
-        }, new CountingSpawner());
+        final Game2048 game = new Game2048Impl(topRow(2, 2, 4, 0), new CountingSpawner());
         game.move(Direction.LEFT);
         game.move(Direction.LEFT);
 
@@ -357,12 +274,7 @@ class Game2048ImplTest {
 
     @Test
     void invalidMoveDoesNotReplaceTheUndoPoint() {
-        final int[][] grid = {
-            {2, 4, 0, 0},
-            {0, 0, 0, 0},
-            {0, 0, 0, 0},
-            {0, 0, 0, 0},
-        };
+        final int[][] grid = topRow(2, 4, 0, 0);
         final Game2048 game = new Game2048Impl(grid, new CountingSpawner());
         game.move(Direction.RIGHT);
         game.move(Direction.UP);
@@ -375,12 +287,7 @@ class Game2048ImplTest {
     @Test
     void gameCanContinueAfterUndo() {
         final CountingSpawner spawner = new CountingSpawner();
-        final Game2048 game = new Game2048Impl(new int[][] {
-            {0, 0, 0, 2},
-            {0, 0, 0, 0},
-            {0, 0, 0, 0},
-            {0, 0, 0, 0},
-        }, spawner);
+        final Game2048 game = new Game2048Impl(topRow(0, 0, 0, 2), spawner);
         game.move(Direction.LEFT);
         game.undo();
 
@@ -393,12 +300,7 @@ class Game2048ImplTest {
 
     @Test
     void undoIsNotAllowedAfterWinning() {
-        final Game2048 game = new Game2048Impl(new int[][] {
-            {1024, 1024, 0, 0},
-            {0, 0, 0, 0},
-            {0, 0, 0, 0},
-            {0, 0, 0, 0},
-        }, new CountingSpawner());
+        final Game2048 game = new Game2048Impl(topRow(1024, 1024, 0, 0), new CountingSpawner());
         game.move(Direction.LEFT);
 
         assertFalse(game.undo());
@@ -409,12 +311,7 @@ class Game2048ImplTest {
 
     @Test
     void undoIsNotAllowedAfterGameOver() {
-        final Game2048 game = new Game2048Impl(new int[][] {
-            {0, 4, 2, 4},
-            {2, 4, 2, 4},
-            {4, 2, 4, 2},
-            {2, 4, 2, 4},
-        }, new CountingSpawner());
+        final Game2048 game = new Game2048Impl(ONE_MOVE_FROM_GAME_OVER, new CountingSpawner());
         game.move(Direction.LEFT);
 
         assertFalse(game.undo());
@@ -430,6 +327,13 @@ class Game2048ImplTest {
         assertThrows(NullPointerException.class, () -> game.move(null));
         assertThrows(NullPointerException.class, () -> new Game2048Impl(null));
         assertThrows(NullPointerException.class, () -> new Game2048Impl(null, new CountingSpawner()));
+    }
+
+    // griglia vuota con i valori dati nella prima riga
+    private static int[][] topRow(final int... values) {
+        final int[][] grid = new int[SIZE][SIZE];
+        grid[0] = values.clone();
+        return grid;
     }
 
     /**

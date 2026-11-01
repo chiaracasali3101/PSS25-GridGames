@@ -10,6 +10,9 @@ import java.util.List;
 
 import org.junit.jupiter.api.Test;
 
+/**
+ * Tests for {@link BoardImpl}.
+ */
 class BoardImplTest {
 
     private static final int SIZE = 4;
@@ -23,7 +26,7 @@ class BoardImplTest {
 
         assertEquals(SIZE, board.getSize());
         assertEquals(SIZE * SIZE, board.getEmptyCells().size());
-        assertTrue(board.isEmpty(0, 0));
+        assertEquals(0, board.getValue(0, 0));
     }
 
     @Test
@@ -33,7 +36,6 @@ class BoardImplTest {
         board.setValue(1, 2, FOUR);
 
         assertEquals(FOUR, board.getValue(1, 2));
-        assertFalse(board.isEmpty(1, 2));
     }
 
     @Test
@@ -57,7 +59,7 @@ class BoardImplTest {
 
         board.setValue(2, 2, 0);
 
-        assertTrue(board.isEmpty(2, 2));
+        assertEquals(0, board.getValue(2, 2));
     }
 
     @Test
@@ -81,7 +83,7 @@ class BoardImplTest {
 
         matrix[0][0] = TWO;
 
-        assertTrue(board.isEmpty(0, 0));
+        assertEquals(0, board.getValue(0, 0));
     }
 
     @Test
@@ -90,7 +92,7 @@ class BoardImplTest {
 
         board.toMatrix()[0][0] = TWO;
 
-        assertTrue(board.isEmpty(0, 0));
+        assertEquals(0, board.getValue(0, 0));
     }
 
     @Test

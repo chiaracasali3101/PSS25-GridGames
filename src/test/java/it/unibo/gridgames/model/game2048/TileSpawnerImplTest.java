@@ -12,6 +12,9 @@ import java.util.Set;
 
 import org.junit.jupiter.api.Test;
 
+/**
+ * Tests for {@link TileSpawnerImpl}.
+ */
 class TileSpawnerImplTest {
 
     private static final int SIZE = 4;
