@@ -2,7 +2,9 @@ package it.unibo.gridgames.model.fifteen;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.Arrays;
 import org.junit.jupiter.api.Test;
@@ -20,6 +22,18 @@ class FifteenBoardTest {
         {9, 6, 0, 3},
         {13, 10, 7, 8},
         {14, 15, 11, 12},
+    };
+    private static final int[][] LAST_TILES_SWAPPED = {
+        {1, 2, 3, 4},
+        {5, 6, 7, 8},
+        {9, 10, 11, 12},
+        {13, 15, 14, 0},
+    };
+    private static final int[][] EMPTY_CELL_FIRST = {
+        {0, 1, 2, 3},
+        {4, 5, 6, 7},
+        {8, 9, 10, 11},
+        {12, 13, 14, 15},
     };
     private static final int[][] NULL_ROW = {
         {1, 2, 3, 4},
@@ -150,6 +164,31 @@ class FifteenBoardTest {
     @Test
     void missingEmptyCellIsRejected() {
         assertRejected(NO_EMPTY_CELL);
+    }
+
+    @Test
+    void newBoardCountsAsSolved() {
+        assertTrue(new FifteenBoardImpl().isSolved());
+    }
+
+    @Test
+    void solvedLayoutCountsAsSolved() {
+        assertTrue(new FifteenBoardImpl(SOLVED).isSolved());
+    }
+
+    @Test
+    void mixedLayoutDoesNotCountAsSolved() {
+        assertFalse(new FifteenBoardImpl(MIXED).isSolved());
+    }
+
+    @Test
+    void twoSwappedTilesDoNotCountAsSolved() {
+        assertFalse(new FifteenBoardImpl(LAST_TILES_SWAPPED).isSolved());
+    }
+
+    @Test
+    void orderedTilesWithEmptyCellFirstDoNotCountAsSolved() {
+        assertFalse(new FifteenBoardImpl(EMPTY_CELL_FIRST).isSolved());
     }
 
     private static void assertRejected(final int[][] tiles) {
