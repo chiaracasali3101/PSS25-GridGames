@@ -7,6 +7,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.Arrays;
+import java.util.List;
 import org.junit.jupiter.api.Test;
 
 class FifteenBoardTest {
@@ -34,6 +35,18 @@ class FifteenBoardTest {
         {4, 5, 6, 7},
         {8, 9, 10, 11},
         {12, 13, 14, 15},
+    };
+    private static final int[][] EMPTY_CELL_ONE_ROW_UP = {
+        {1, 2, 3, 4},
+        {5, 6, 7, 8},
+        {9, 10, 11, 0},
+        {13, 14, 15, 12},
+    };
+    private static final int[][] EMPTY_CELL_ONE_ROW_UP_WITH_SWAP = {
+        {2, 1, 3, 4},
+        {5, 6, 7, 8},
+        {9, 10, 11, 0},
+        {13, 14, 15, 12},
     };
     private static final int[][] NULL_ROW = {
         {1, 2, 3, 4},
@@ -189,6 +202,40 @@ class FifteenBoardTest {
     @Test
     void orderedTilesWithEmptyCellFirstDoNotCountAsSolved() {
         assertFalse(new FifteenBoardImpl(EMPTY_CELL_FIRST).isSolved());
+    }
+
+    @Test
+    void solvedLayoutIsSolvable() {
+        assertTrue(new FifteenBoardImpl().isSolvable());
+    }
+
+    @Test
+    void layoutOneMoveFromSolvedIsSolvable() {
+        assertTrue(new FifteenBoardImpl(EMPTY_CELL_ONE_ROW_UP).isSolvable());
+    }
+
+    @Test
+    void lastTilesSwappedAreNotSolvable() {
+        assertFalse(new FifteenBoardImpl(LAST_TILES_SWAPPED).isSolvable());
+    }
+
+    @Test
+    void swappingTwoTilesMakesLayoutNotSolvable() {
+        assertFalse(new FifteenBoardImpl(EMPTY_CELL_ONE_ROW_UP_WITH_SWAP).isSolvable());
+    }
+
+    @Test
+    void orderedTilesWithEmptyCellFirstAreNotSolvable() {
+        assertFalse(new FifteenBoardImpl(EMPTY_CELL_FIRST).isSolvable());
+    }
+
+    @Test
+    void legalMovesKeepTheBoardSolvable() {
+        final FifteenBoard board = new FifteenBoardImpl();
+        for (final Direction direction : List.of(Direction.DOWN, Direction.RIGHT, Direction.DOWN, Direction.UP)) {
+            assertTrue(board.move(direction));
+            assertTrue(board.isSolvable());
+        }
     }
 
     private static void assertRejected(final int[][] tiles) {
