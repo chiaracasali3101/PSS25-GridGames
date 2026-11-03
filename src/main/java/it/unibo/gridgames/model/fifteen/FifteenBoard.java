@@ -74,4 +74,11 @@ public interface FifteenBoard {
      * @return the move count
      */
     int getMoveCount();
+
+    /**
+     * Tells whether the solved layout can be reached from this one with legal moves.
+     *
+     * @return true if the board can be solved
+     */
+    boolean isSolvable();
 }

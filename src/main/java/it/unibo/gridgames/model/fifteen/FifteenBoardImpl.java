@@ -102,6 +102,21 @@ public final class FifteenBoardImpl implements FifteenBoard {
         return this.moveCount;
     }
 
+    @Override
+    public boolean isSolvable() {
+        final int[] cells = Arrays.stream(this.tiles)
+            .flatMapToInt(Arrays::stream)
+            .filter(tile -> tile != EMPTY)
+            .toArray();
+        final int inversions = IntStream.range(0, cells.length)
+            .map(first -> (int) IntStream.range(first + 1, cells.length)
+                .filter(second -> cells[second] < cells[first])
+                .count())
+            .sum();
+        // On an even-sized board, a legal move never changes the parity of this sum.
+        return (inversions + SIZE - this.emptyRow) % 2 != 0;
+    }
+
     private boolean moveIfInside(final int row, final int column) {
         return isInside(row, column) && moveTile(row, column);
     }
