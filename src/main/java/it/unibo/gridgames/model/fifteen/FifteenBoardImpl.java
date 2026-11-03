@@ -64,13 +64,23 @@ public final class FifteenBoardImpl implements FifteenBoard {
         return copyOf(this.tiles);
     }
 
+    @Override
+    public boolean isSolved() {
+        final int[] cells = Arrays.stream(this.tiles).flatMapToInt(Arrays::stream).toArray();
+        return IntStream.range(0, CELLS).allMatch(cell -> cells[cell] == solvedValue(cell));
+    }
+
     private static int[][] solvedTiles() {
         final int[][] solved = new int[SIZE][SIZE];
         for (int cell = 0; cell < CELLS; cell++) {
-            // Tiles are 1-based, and the last cell wraps around to EMPTY.
-            solved[cell / SIZE][cell % SIZE] = (cell + 1) % CELLS;
+            solved[cell / SIZE][cell % SIZE] = solvedValue(cell);
         }
         return solved;
+    }
+
+    // Tiles are 1-based, and the last cell wraps around to EMPTY.
+    private static int solvedValue(final int cell) {
+        return (cell + 1) % CELLS;
     }
 
     private static void checkLayout(final int[][] tiles) {

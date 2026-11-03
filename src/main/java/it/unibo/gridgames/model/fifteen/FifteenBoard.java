@@ -41,4 +41,11 @@ public interface FifteenBoard {
      * @return the tiles, indexed by row and then by column
      */
     int[][] getTiles();
+
+    /**
+     * Tells whether the tiles are in order, with the empty cell in the last position.
+     *
+     * @return true if the board is solved
+     */
+    boolean isSolved();
 }
