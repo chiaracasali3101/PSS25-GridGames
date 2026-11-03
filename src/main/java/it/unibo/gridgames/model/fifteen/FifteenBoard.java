@@ -48,4 +48,30 @@ public interface FifteenBoard {
      * @return true if the board is solved
      */
     boolean isSolved();
+
+    /**
+     * Slides into the empty cell the tile that can move towards the given direction.
+     *
+     * @param direction the direction the tile slides towards
+     * @return true if a tile moved, false if no tile can slide that way
+     * @throws IllegalArgumentException if the direction is null
+     */
+    boolean move(Direction direction);
+
+    /**
+     * Slides the tile in the given cell into the empty cell, if they are adjacent.
+     *
+     * @param row the row index of the tile
+     * @param column the column index of the tile
+     * @return true if the tile moved, false if it is not adjacent to the empty cell
+     * @throws IllegalArgumentException if the cell is outside the board
+     */
+    boolean moveTile(int row, int column);
+
+    /**
+     * Returns the number of legal moves made so far.
+     *
+     * @return the move count
+     */
+    int getMoveCount();
 }

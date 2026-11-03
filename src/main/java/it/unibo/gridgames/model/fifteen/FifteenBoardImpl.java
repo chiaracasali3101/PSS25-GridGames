@@ -13,6 +13,7 @@ public final class FifteenBoardImpl implements FifteenBoard {
     private final int[][] tiles;
     private int emptyRow;
     private int emptyColumn;
+    private int moveCount;
 
     /**
      * Creates a board in the solved layout.
@@ -43,9 +44,7 @@ public final class FifteenBoardImpl implements FifteenBoard {
 
     @Override
     public int getTile(final int row, final int column) {
-        if (row < 0 || row >= SIZE || column < 0 || column >= SIZE) {
-            throw new IllegalArgumentException("Cell outside the board");
-        }
+        checkInside(row, column);
         return this.tiles[row][column];
     }
 
@@ -68,6 +67,53 @@ public final class FifteenBoardImpl implements FifteenBoard {
     public boolean isSolved() {
         final int[] cells = Arrays.stream(this.tiles).flatMapToInt(Arrays::stream).toArray();
         return IntStream.range(0, CELLS).allMatch(cell -> cells[cell] == solvedValue(cell));
+    }
+
+    @Override
+    public boolean move(final Direction direction) {
+        if (direction == null) {
+            throw new IllegalArgumentException("The direction must not be null");
+        }
+        // The tile that slides is on the opposite side of the empty cell.
+        return switch (direction) {
+            case UP -> moveIfInside(this.emptyRow + 1, this.emptyColumn);
+            case DOWN -> moveIfInside(this.emptyRow - 1, this.emptyColumn);
+            case LEFT -> moveIfInside(this.emptyRow, this.emptyColumn + 1);
+            case RIGHT -> moveIfInside(this.emptyRow, this.emptyColumn - 1);
+        };
+    }
+
+    @Override
+    public boolean moveTile(final int row, final int column) {
+        checkInside(row, column);
+        if (Math.abs(row - this.emptyRow) + Math.abs(column - this.emptyColumn) != 1) {
+            return false;
+        }
+        this.tiles[this.emptyRow][this.emptyColumn] = this.tiles[row][column];
+        this.tiles[row][column] = EMPTY;
+        this.emptyRow = row;
+        this.emptyColumn = column;
+        this.moveCount++;
+        return true;
+    }
+
+    @Override
+    public int getMoveCount() {
+        return this.moveCount;
+    }
+
+    private boolean moveIfInside(final int row, final int column) {
+        return isInside(row, column) && moveTile(row, column);
+    }
+
+    private static boolean isInside(final int row, final int column) {
+        return row >= 0 && row < SIZE && column >= 0 && column < SIZE;
+    }
+
+    private static void checkInside(final int row, final int column) {
+        if (!isInside(row, column)) {
+            throw new IllegalArgumentException("Cell outside the board");
+        }
     }
 
     private static int[][] solvedTiles() {
