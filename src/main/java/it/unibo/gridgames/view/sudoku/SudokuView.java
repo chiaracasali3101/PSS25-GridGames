@@ -17,6 +17,7 @@ public final class SudokuView extends BorderPane {
 
     // bottoni
     private final Button btnBack = new Button("Indietro");
+    private final Button[][] cells = new Button[Grid.SIZE][Grid.SIZE];
 
     // scritte
     private final Label errorsLabel = new Label("Errori: 0/3");
@@ -45,6 +46,7 @@ public final class SudokuView extends BorderPane {
                 final Button cell = new Button();
                 cell.setPrefSize(UIConstants.CELL_SIZE.getValue(), UIConstants.CELL_SIZE.getValue());
                 cell.setStyle("-fx-background-color: white; -fx-border-color: #cccccc; -fx-background-radius: 0;");
+                cells[row][col] = cell;
                 grid.add(cell, col, row);
             }
         }
@@ -70,5 +72,32 @@ public final class SudokuView extends BorderPane {
      */
     public void setOnBackSelected(final Runnable handler) {
         this.btnBack.setOnAction(e -> handler.run());
+    }
+        /**
+     * Shows a number in a cell of the grid.
+     *
+     * @param row   the row of the cell
+     * @param col   the column of the cell
+     * @param value the number to show, or 0 for an empty cell
+     * @param fixed true if the number was given at the start of the game
+     */
+    public void showCell(final int row, final int col, final int value, final boolean fixed) {
+        final Button cell = cells[row][col];
+
+        // il numero: niente se la cella è vuota
+        if (value == 0) {
+            cell.setText("");
+        } else {
+            cell.setText(String.valueOf(value));
+        }
+
+        // il colore: marrone per i numeri fissi, arancione per quelli del giocatore
+        if (fixed) {
+            cell.setStyle("-fx-background-color: white; -fx-text-fill: rgb(122, 60, 7); -fx-font-weight: bold;"
+                + " -fx-border-color: #cccccc; -fx-background-radius: 0;");
+        } else {
+            cell.setStyle("-fx-background-color: white; -fx-text-fill: #e67e22;"
+                + " -fx-border-color: #cccccc; -fx-background-radius: 0;");
+        }
     }
 }
