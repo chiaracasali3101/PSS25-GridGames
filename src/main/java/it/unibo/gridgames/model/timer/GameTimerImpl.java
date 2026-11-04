@@ -114,7 +114,7 @@ public final class GameTimerImpl implements GameTimer {
     }
 
     @Override
-    public void setOnTick(final Consumer<Duration> listener) {
+    public void onTick(final Consumer<Duration> listener) {
         if (listener == null) {
             throw new IllegalArgumentException("The listener must not be null");
         }

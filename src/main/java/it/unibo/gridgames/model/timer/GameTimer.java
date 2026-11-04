@@ -59,5 +59,5 @@ public interface GameTimer {
      * @param listener the action, which receives the elapsed time
      * @throws IllegalArgumentException if the action is null
      */
-    void setOnTick(Consumer<Duration> listener);
+    void onTick(Consumer<Duration> listener);
 }

@@ -54,7 +54,7 @@ class GameTimerTest {
         assertThrows(IllegalArgumentException.class, () -> new GameTimerImpl(this.clock, null));
         assertThrows(IllegalArgumentException.class, () -> new GameTimerImpl(this.clock, Duration.ZERO));
         assertThrows(IllegalArgumentException.class, () -> new GameTimerImpl(this.clock, LONG_PERIOD.negated()));
-        assertThrows(IllegalArgumentException.class, () -> this.timer.setOnTick(null));
+        assertThrows(IllegalArgumentException.class, () -> this.timer.onTick(null));
     }
 
     @Test
@@ -229,7 +229,7 @@ class GameTimerTest {
     void ticksCarryTheElapsedTime() {
         final BlockingQueue<Duration> ticks = new LinkedBlockingQueue<>();
         this.timer = new GameTimerImpl(this.clock, TICK_PERIOD);
-        this.timer.setOnTick(ticks::add);
+        this.timer.onTick(ticks::add);
         this.timer.start();
         this.clock.advance(STEP);
         assertTimeoutPreemptively(TIMEOUT, () -> {
@@ -276,7 +276,7 @@ class GameTimerTest {
     void timerCanBeStoppedFromItsOwnTick() throws InterruptedException {
         final Semaphore stopped = new Semaphore(0);
         this.timer = new GameTimerImpl(this.clock, TICK_PERIOD);
-        this.timer.setOnTick(elapsed -> {
+        this.timer.onTick(elapsed -> {
             this.timer.stop();
             stopped.release();
         });
@@ -322,7 +322,7 @@ class GameTimerTest {
     private Semaphore startTickingTimer() {
         final Semaphore ticks = new Semaphore(0);
         this.timer = new GameTimerImpl(this.clock, TICK_PERIOD);
-        this.timer.setOnTick(elapsed -> ticks.release());
+        this.timer.onTick(elapsed -> ticks.release());
         this.timer.start();
         return ticks;
     }
