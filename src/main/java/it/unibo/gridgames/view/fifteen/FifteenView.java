@@ -45,6 +45,25 @@ public interface FifteenView {
     void showVictory();
 
     /**
+     * Asks the user for a name to save the result under.
+     *
+     * <p>The user can decline, in which case the action is never called.
+     *
+     * @param listener the action called at most once, which receives the name entered
+     */
+    void askPlayerName(Consumer<String> listener);
+
+    /**
+     * Tells the user that the name entered cannot be used.
+     */
+    void showInvalidPlayerName();
+
+    /**
+     * Tells the user that the result could not be saved.
+     */
+    void showSaveError();
+
+    /**
      * Sets the action called when the user selects a tile.
      *
      * @param listener the action, which receives the row and the column of the tile
