@@ -10,6 +10,7 @@ import it.unibo.gridgames.model.score.GameType;
 import it.unibo.gridgames.model.sudoku.Difficulty;
 import it.unibo.gridgames.persistence.ScoreManager;
 import it.unibo.gridgames.view.sudoku.DifficultyView;
+import it.unibo.gridgames.view.sudoku.SudokuView; 
 import javafx.scene.Scene;
 
 /**
@@ -21,6 +22,7 @@ public class SudokuController {
 
     private final Scene scene;
     private final DifficultyView difficultyView = new DifficultyView();
+    private final SudokuView sudokuView = new SudokuView(); // NUOVO
     private final ScoreManager scoreManager;
 
     /**
@@ -36,7 +38,8 @@ public class SudokuController {
 
         this.difficultyView.setOnBackSelected(onBackToMenu);
         this.difficultyView.setOnDifficultySelected(this::startGame);
-    } // <-- Il costruttore si chiude qui!
+        this.sudokuView.setOnBackSelected(this::start); // NUOVO: dal gioco torna alla scelta della difficoltà
+    }
 
     /**
      * Shows the difficulty selection screen.
@@ -46,8 +49,7 @@ public class SudokuController {
     }
 
     private void startGame(final Difficulty difficulty) {
-        // temporaneo: qui poi si aprirà la SudokuView
-        System.out.println("Difficoltà scelta: " + difficulty);
+        this.scene.setRoot(this.sudokuView); // NUOVO: mostra la griglia
 
         // --- SIMULAZIONE FINE PARTITA (da rimuovere dopo il test) ---
         this.saveGameRecord("TestSudoku", 1500, 24, 180L);

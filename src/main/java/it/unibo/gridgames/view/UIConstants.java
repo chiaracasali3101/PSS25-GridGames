@@ -10,8 +10,9 @@ public enum UIConstants {
     FONT_SIZE_TITLE(36),
     GRID_SIZE(10),
     BUTTON_BACK(15),
-    BUTTON_WIDTH(160);
-
+    BUTTON_WIDTH(160),
+    CELL_SIZE(30);
+    
     private final int value;
 
     UIConstants(final int value) {
