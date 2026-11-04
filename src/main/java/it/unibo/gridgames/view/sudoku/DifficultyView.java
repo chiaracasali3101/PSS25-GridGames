@@ -20,7 +20,6 @@ import javafx.scene.text.FontWeight;
  */
 public final class DifficultyView extends BorderPane {
 
-    private static final double BUTTON_WIDTH = 160;
 
     // bottoni
     private final Button btnBack = new Button("Indietro");
@@ -42,7 +41,7 @@ public final class DifficultyView extends BorderPane {
         // bottone indietro
         btnBack.setStyle("-fx-background-color: darkorange; -fx-text-fill: white; -fx-font-weight: bold;");
 
-        // bottone indietro nella sua scatola, a destra
+        // bottone indietro nella sua scatola, a sinistra
         final HBox backBox = new HBox(btnBack);
         backBox.setAlignment(Pos.CENTER_LEFT);
         VBox.setMargin(backBox, new Insets(UIConstants.BUTTON_BACK.getValue()));
@@ -55,11 +54,11 @@ public final class DifficultyView extends BorderPane {
         this.setTop(topBox);
 
         // bottoni delle difficoltà
-        btnEasy.setPrefWidth(BUTTON_WIDTH);
+        btnEasy.setPrefWidth(UIConstants.BUTTON_WIDTH.getValue());
         btnEasy.setStyle("-fx-background-color: rgb(240, 158, 85); -fx-text-fill: white; -fx-background-radius: 8;");
-        btnMedium.setPrefWidth(BUTTON_WIDTH);
+        btnMedium.setPrefWidth(UIConstants.BUTTON_WIDTH.getValue());
         btnMedium.setStyle("-fx-background-color: #e67e22; -fx-text-fill: white; -fx-background-radius: 8;");
-        btnHard.setPrefWidth(BUTTON_WIDTH);
+        btnHard.setPrefWidth(UIConstants.BUTTON_WIDTH.getValue());
         btnHard.setStyle("-fx-background-color: rgb(122, 60, 7); -fx-text-fill: white; -fx-background-radius: 8;");
 
         // bottoni al centro, uno sotto l'altro
