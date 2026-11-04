@@ -12,6 +12,7 @@ public enum UIConstants {
     BUTTON_BACK(15),
     BUTTON_WIDTH(160),
     CELL_SIZE(30);
+    
     private final int value;
 
     UIConstants(final int value) {
