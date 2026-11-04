@@ -10,10 +10,18 @@ import it.unibo.gridgames.model.fifteen.Direction;
 import it.unibo.gridgames.model.fifteen.FifteenBoardImpl;
 import it.unibo.gridgames.model.fifteen.FifteenGame;
 import it.unibo.gridgames.model.fifteen.FifteenGameImpl;
+import it.unibo.gridgames.model.fifteen.FifteenScore;
+import it.unibo.gridgames.model.score.GameRecordImpl;
+import it.unibo.gridgames.model.score.GameType;
 import it.unibo.gridgames.model.timer.GameTimer;
+import it.unibo.gridgames.persistence.ScoreManager;
 import it.unibo.gridgames.view.fifteen.FifteenView;
+import java.io.IOException;
 import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.ArrayDeque;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Queue;
 import java.util.concurrent.Executor;
 import java.util.function.BiConsumer;
@@ -46,9 +54,13 @@ class FifteenControllerTest {
     private static final int FOURTEEN_COLUMN = 1;
     private static final Duration PLAYED = Duration.ofSeconds(7);
     private static final Duration PLAYED_LATER = Duration.ofSeconds(9);
+    private static final Duration PLAYED_WITH_FRACTION = Duration.ofMillis(7_900);
+    private static final long PLAYED_SECONDS = 7L;
+    private static final String PLAYER = "Martina";
 
     private FakeView view;
     private FakeTimer timer;
+    private FakeScoreManager scoreManager;
     private QueuedExecutor uiExecutor;
     private int backCalls;
     private FifteenController controller;
@@ -57,12 +69,14 @@ class FifteenControllerTest {
     void createController() {
         this.view = new FakeView();
         this.timer = new FakeTimer();
+        this.scoreManager = new FakeScoreManager();
         this.uiExecutor = new QueuedExecutor();
         this.controller = new FifteenControllerImpl(
             this.view,
             newGame(),
             this.timer,
             this.uiExecutor,
+            this.scoreManager,
             () -> this.backCalls++
         );
     }
@@ -72,15 +86,17 @@ class FifteenControllerTest {
         final FifteenGame game = newGame();
         final Runnable onBack = () -> { };
         assertThrows(IllegalArgumentException.class,
-            () -> new FifteenControllerImpl(null, game, this.timer, this.uiExecutor, onBack));
+            () -> new FifteenControllerImpl(null, game, this.timer, this.uiExecutor, this.scoreManager, onBack));
         assertThrows(IllegalArgumentException.class,
-            () -> new FifteenControllerImpl(this.view, null, this.timer, this.uiExecutor, onBack));
+            () -> new FifteenControllerImpl(this.view, null, this.timer, this.uiExecutor, this.scoreManager, onBack));
         assertThrows(IllegalArgumentException.class,
-            () -> new FifteenControllerImpl(this.view, game, null, this.uiExecutor, onBack));
+            () -> new FifteenControllerImpl(this.view, game, null, this.uiExecutor, this.scoreManager, onBack));
         assertThrows(IllegalArgumentException.class,
-            () -> new FifteenControllerImpl(this.view, game, this.timer, null, onBack));
+            () -> new FifteenControllerImpl(this.view, game, this.timer, null, this.scoreManager, onBack));
         assertThrows(IllegalArgumentException.class,
-            () -> new FifteenControllerImpl(this.view, game, this.timer, this.uiExecutor, null));
+            () -> new FifteenControllerImpl(this.view, game, this.timer, this.uiExecutor, null, onBack));
+        assertThrows(IllegalArgumentException.class,
+            () -> new FifteenControllerImpl(this.view, game, this.timer, this.uiExecutor, this.scoreManager, null));
     }
 
     @Test
@@ -267,6 +283,110 @@ class FifteenControllerTest {
         assertEquals(updatesBefore, this.view.timeUpdates);
     }
 
+    @Test
+    void victoryAsksForThePlayerNameOnce() {
+        this.controller.start();
+        this.view.selectTile(LAST, LAST);
+        this.view.selectTile(LAST, EMPTY_COLUMN);
+        assertEquals(1, this.view.nameRequests);
+    }
+
+    @Test
+    void movesThatDoNotWinDoNotAskForTheName() {
+        this.controller.start();
+        this.view.selectTile(LAST, FOURTEEN_COLUMN);
+        this.view.selectTile(0, 0);
+        assertEquals(0, this.view.nameRequests);
+    }
+
+    @Test
+    void nothingIsSavedBeforeTheNameIsEntered() {
+        winGame(PLAYED);
+        assertTrue(this.scoreManager.saved.isEmpty());
+    }
+
+    @Test
+    void enteredNameSavesTheRecordOfTheGame() {
+        winGame(PLAYED);
+        final LocalDateTime before = LocalDateTime.now();
+        this.view.enterName(PLAYER);
+        final LocalDateTime after = LocalDateTime.now();
+        assertEquals(1, this.scoreManager.saved.size());
+        final GameRecordImpl record = this.scoreManager.saved.getFirst();
+        assertEquals(PLAYER, record.getPlayerName());
+        assertEquals(GameType.PUZZLE_15, record.getGameType());
+        assertEquals(1, record.getMoves());
+        assertEquals(PLAYED_SECONDS, record.getDurationSeconds());
+        assertEquals(FifteenScore.compute(1), record.getScore());
+        assertFalse(record.getDateTime().isBefore(before));
+        assertFalse(record.getDateTime().isAfter(after));
+    }
+
+    @Test
+    void savedDurationIsInWholeSeconds() {
+        winGame(PLAYED_WITH_FRACTION);
+        this.view.enterName(PLAYER);
+        assertEquals(PLAYED_SECONDS, this.scoreManager.saved.getFirst().getDurationSeconds());
+    }
+
+    @Test
+    void nameEnteredAfterANewGameSavesTheFinishedGame() {
+        winGame(PLAYED);
+        this.view.selectNewGame();
+        this.view.selectTile(LAST, FOURTEEN_COLUMN);
+        this.timer.elapsed = PLAYED_LATER;
+        this.view.enterName(PLAYER);
+        final GameRecordImpl record = this.scoreManager.saved.getFirst();
+        assertEquals(1, record.getMoves());
+        assertEquals(PLAYED_SECONDS, record.getDurationSeconds());
+    }
+
+    @Test
+    void blankNameIsRefusedAndAskedAgain() {
+        checkRefusedName("   ");
+    }
+
+    @Test
+    void nameWithACommaIsRefusedAndAskedAgain() {
+        checkRefusedName("Mar,tina");
+    }
+
+    @Test
+    void saveFailureIsReportedWithoutStoppingTheApplication() {
+        this.scoreManager.failing = true;
+        winGame(PLAYED);
+        this.view.enterName(PLAYER);
+        assertEquals(1, this.view.saveErrors);
+        assertTrue(this.scoreManager.saved.isEmpty());
+        this.view.selectNewGame();
+        assertTrue(this.timer.isRunning());
+    }
+
+    @Test
+    void successfulSaveReportsNoError() {
+        winGame(PLAYED);
+        this.view.enterName(PLAYER);
+        assertEquals(0, this.view.saveErrors);
+        assertEquals(0, this.view.invalidNames);
+    }
+
+    private void winGame(final Duration played) {
+        this.controller.start();
+        this.timer.elapsed = played;
+        this.view.selectTile(LAST, LAST);
+    }
+
+    private void checkRefusedName(final String name) {
+        winGame(PLAYED);
+        this.view.enterName(name);
+        assertTrue(this.scoreManager.saved.isEmpty());
+        assertEquals(1, this.view.invalidNames);
+        assertEquals(2, this.view.nameRequests);
+        this.view.enterName(PLAYER);
+        assertEquals(1, this.scoreManager.saved.size());
+        assertEquals(2, this.view.nameRequests);
+    }
+
     private static FifteenGame newGame() {
         return new FifteenGameImpl(() -> new FifteenBoardImpl(ONE_MOVE_LEFT));
     }
@@ -339,6 +459,45 @@ class FifteenControllerTest {
         }
     }
 
+    private static final class FakeScoreManager implements ScoreManager {
+
+        private final List<GameRecordImpl> saved = new ArrayList<>();
+        private boolean failing;
+
+        @Override
+        public void saveScore(final GameRecordImpl gameRecord) throws IOException {
+            if (this.failing) {
+                throw new IOException("Disk full");
+            }
+            this.saved.add(gameRecord);
+        }
+
+        @Override
+        public List<GameRecordImpl> loadAllScores() {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public List<GameRecordImpl> getTopScores(final GameType gameType, final int limit) {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public int getNumberOfGamesPlayed(final GameType gameType) {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public double getAverageScore(final GameType gameType) {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public GameRecordImpl getHighestScore(final GameType gameType) {
+            throw new UnsupportedOperationException();
+        }
+    }
+
     private static final class FakeView implements FifteenView {
 
         private int showCalls;
@@ -348,6 +507,10 @@ class FifteenControllerTest {
         private Duration time;
         private int timeUpdates;
         private int victories;
+        private int nameRequests;
+        private int invalidNames;
+        private int saveErrors;
+        private Consumer<String> onName = name -> { };
         private BiConsumer<Integer, Integer> onTile = (row, column) -> { };
         private Consumer<Direction> onDirection = direction -> { };
         private Runnable onNewGame = () -> { };
@@ -367,6 +530,10 @@ class FifteenControllerTest {
 
         void selectBack() {
             this.onBack.run();
+        }
+
+        void enterName(final String name) {
+            this.onName.accept(name);
         }
 
         @Override
@@ -394,6 +561,22 @@ class FifteenControllerTest {
         @Override
         public void showVictory() {
             this.victories++;
+        }
+
+        @Override
+        public void askPlayerName(final Consumer<String> listener) {
+            this.onName = listener;
+            this.nameRequests++;
+        }
+
+        @Override
+        public void showInvalidPlayerName() {
+            this.invalidNames++;
+        }
+
+        @Override
+        public void showSaveError() {
+            this.saveErrors++;
         }
 
         @Override
