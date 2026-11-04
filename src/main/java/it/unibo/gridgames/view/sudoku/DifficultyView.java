@@ -3,12 +3,15 @@ package it.unibo.gridgames.view.sudoku;
 import java.util.function.Consumer;
 
 import it.unibo.gridgames.model.sudoku.Difficulty;
+import it.unibo.gridgames.view.UIConstants;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
+import javafx.scene.layout.HBox;
+import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 
@@ -17,38 +20,55 @@ import javafx.scene.text.FontWeight;
  */
 public final class DifficultyView extends BorderPane {
 
-    private static final double TITLE_SIZE = 32;
     private static final double BUTTON_WIDTH = 160;
-    private static final double SPACING = 15;
-    private static final double MARGIN = 20;
 
-    private Consumer<Difficulty> onDifficultySelected = difficulty -> { };
-    private Runnable onBackSelected = () -> { };
+    // bottoni
+    private final Button btnBack = new Button("Indietro");
+    private final Button btnEasy = new Button("Facile");
+    private final Button btnMedium = new Button("Medio");
+    private final Button btnHard = new Button("Difficile");
 
     /**
      * Creates the screen with one button for each difficulty.
      */
     public DifficultyView() {
+        this.setStyle("-fx-background-color: #f7f9fa;"); // sfondo
+
+        // titolo
         final Label title = new Label("Sudoku");
-        title.setFont(Font.font("Arial", FontWeight.BOLD, TITLE_SIZE));
-        BorderPane.setAlignment(title, Pos.CENTER);
-        BorderPane.setMargin(title, new Insets(MARGIN));
-        this.setTop(title);
+        title.setFont(Font.font("Arial", FontWeight.BOLD, UIConstants.FONT_SIZE_TITLE.getValue()));
+        title.setTextFill(Color.DARKORANGE);
 
-        final VBox buttons = new VBox(SPACING);
+        // bottone indietro
+        btnBack.setStyle("-fx-background-color: darkorange; -fx-text-fill: white; -fx-font-weight: bold;");
+
+        // bottone indietro nella sua scatola, a destra
+        final HBox backBox = new HBox(btnBack);
+        backBox.setAlignment(Pos.CENTER_LEFT);
+        VBox.setMargin(backBox, new Insets(UIConstants.BUTTON_BACK.getValue()));
+
+        // in alto: prima il bottone, poi il titolo al centro
+        final VBox topBox = new VBox(UIConstants.GRID_SIZE.getValue());
+        topBox.setAlignment(Pos.CENTER);
+        topBox.getChildren().add(backBox);
+        topBox.getChildren().add(title);
+        this.setTop(topBox);
+
+        // bottoni delle difficoltà
+        btnEasy.setPrefWidth(BUTTON_WIDTH);
+        btnEasy.setStyle("-fx-background-color: rgb(240, 158, 85); -fx-text-fill: white; -fx-background-radius: 8;");
+        btnMedium.setPrefWidth(BUTTON_WIDTH);
+        btnMedium.setStyle("-fx-background-color: #e67e22; -fx-text-fill: white; -fx-background-radius: 8;");
+        btnHard.setPrefWidth(BUTTON_WIDTH);
+        btnHard.setStyle("-fx-background-color: rgb(122, 60, 7); -fx-text-fill: white; -fx-background-radius: 8;");
+
+        // bottoni al centro, uno sotto l'altro
+        final VBox buttons = new VBox(UIConstants.GRID_SIZE.getValue());
         buttons.setAlignment(Pos.CENTER);
-        for (final Difficulty difficulty : Difficulty.values()) {
-            final Button button = new Button(labelOf(difficulty));
-            button.setPrefWidth(BUTTON_WIDTH);
-            button.setOnAction(e -> onDifficultySelected.accept(difficulty));
-            buttons.getChildren().add(button);
-        }
+        buttons.getChildren().add(btnEasy);
+        buttons.getChildren().add(btnMedium);
+        buttons.getChildren().add(btnHard);
         this.setCenter(buttons);
-
-        final Button back = new Button("← Menu");
-        back.setOnAction(e -> onBackSelected.run());
-        BorderPane.setMargin(back, new Insets(MARGIN));
-        this.setBottom(back);
     }
 
     /**
@@ -57,7 +77,9 @@ public final class DifficultyView extends BorderPane {
      * @param handler receives the chosen difficulty
      */
     public void setOnDifficultySelected(final Consumer<Difficulty> handler) {
-        this.onDifficultySelected = handler;
+        this.btnEasy.setOnAction(e -> handler.accept(Difficulty.EASY));
+        this.btnMedium.setOnAction(e -> handler.accept(Difficulty.MEDIUM));
+        this.btnHard.setOnAction(e -> handler.accept(Difficulty.HARD));
     }
 
     /**
@@ -66,14 +88,6 @@ public final class DifficultyView extends BorderPane {
      * @param handler the action to run
      */
     public void setOnBackSelected(final Runnable handler) {
-        this.onBackSelected = handler;
-    }
-
-    private static String labelOf(final Difficulty difficulty) {
-        return switch (difficulty) {
-            case EASY -> "Facile";
-            case MEDIUM -> "Medio";
-            case HARD -> "Difficile";
-        };
+        this.btnBack.setOnAction(e -> handler.run());
     }
 }
