@@ -112,6 +112,11 @@ public final class FifteenViewImpl extends BorderPane implements FifteenView {
     }
 
     @Override
+    public void showIllegalMove() {
+        this.message.setText("Mossa non valida");
+    }
+
+    @Override
     public void askPlayerName(final Consumer<String> listener) {
         final TextInputDialog dialog = new TextInputDialog();
         dialog.initOwner(this.getScene().getWindow());

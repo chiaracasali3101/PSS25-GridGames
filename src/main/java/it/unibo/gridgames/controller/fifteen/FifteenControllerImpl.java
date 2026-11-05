@@ -108,14 +108,18 @@ public final class FifteenControllerImpl implements FifteenController {
     }
 
     private void moveTile(final int row, final int column) {
-        if (this.game.moveTile(row, column)) {
-            handleMove();
-        }
+        handleMoveResult(this.game.moveTile(row, column));
     }
 
     private void move(final Direction direction) {
-        if (this.game.move(direction)) {
+        handleMoveResult(this.game.move(direction));
+    }
+
+    private void handleMoveResult(final boolean moved) {
+        if (moved) {
             handleMove();
+        } else if (this.game.getState() == FifteenGameState.PLAYING) {
+            this.view.showIllegalMove();
         }
     }
 

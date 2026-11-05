@@ -45,6 +45,13 @@ public interface FifteenView {
     void showVictory();
 
     /**
+     * Tells the user that the requested move is not possible, without interrupting the game.
+     *
+     * <p>The notice lasts until the board is drawn again.
+     */
+    void showIllegalMove();
+
+    /**
      * Asks the user for a name to save the result under.
      *
      * <p>The user can decline, in which case the action is never called.
