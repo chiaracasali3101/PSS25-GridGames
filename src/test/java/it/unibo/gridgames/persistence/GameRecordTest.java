@@ -1,4 +1,4 @@
-package it.unibo.gridgames;
+package it.unibo.gridgames.persistence;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
@@ -38,7 +38,7 @@ class GameRecordTest {
         assertEquals(GameType.GAME_2048, record.getGameType(), "Il gioco non corrisponde");
         assertEquals(MOVES, record.getMoves(), "Il numero di mosse non corrisponde");
         assertEquals(DURATION, record.getDurationSeconds(), "La durata non corrisponde");
-        assertEquals(now, record.getTimestamp(), "La data non corrisponde");
+        assertEquals(now, record.getDateTime(), "La data non corrisponde");
     }
 
     /**

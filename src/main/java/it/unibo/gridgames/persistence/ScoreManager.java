@@ -32,7 +32,7 @@ public interface ScoreManager {
      */
     // riapre il file e converte tutti i record in oggetti GameRecordImpl
     // restituendo la lista
-    List<GameRecordImpl> loadAllScores() throws IOException;
+    List<GameRecordImpl> loadAllScores();
 
     /**
      * Retrieves the top scores for a specific game type, limited to a specified number of records.
