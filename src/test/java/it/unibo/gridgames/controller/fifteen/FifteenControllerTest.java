@@ -153,6 +153,37 @@ class FifteenControllerTest {
     }
 
     @Test
+    void illegalMoveOnATileIsReported() {
+        this.controller.start();
+        this.view.selectTile(0, 0);
+        assertEquals(1, this.view.illegalMoves);
+    }
+
+    @Test
+    void illegalMoveByDirectionIsReported() {
+        this.controller.start();
+        this.view.selectDirection(Direction.UP);
+        assertEquals(1, this.view.illegalMoves);
+    }
+
+    @Test
+    void legalMovesAreNotReportedAsIllegal() {
+        this.controller.start();
+        this.view.selectTile(LAST, FOURTEEN_COLUMN);
+        this.view.selectDirection(Direction.LEFT);
+        assertEquals(0, this.view.illegalMoves);
+    }
+
+    @Test
+    void movesAfterTheVictoryAreNotReportedAsIllegal() {
+        this.controller.start();
+        this.view.selectTile(LAST, LAST);
+        this.view.selectTile(0, 0);
+        this.view.selectDirection(Direction.UP);
+        assertEquals(0, this.view.illegalMoves);
+    }
+
+    @Test
     void winningOnATileEndsTheGame() {
         this.controller.start();
         this.timer.elapsed = PLAYED;
@@ -510,6 +541,7 @@ class FifteenControllerTest {
         private int nameRequests;
         private int invalidNames;
         private int saveErrors;
+        private int illegalMoves;
         private Consumer<String> onName = name -> { };
         private BiConsumer<Integer, Integer> onTile = (row, column) -> { };
         private Consumer<Direction> onDirection = direction -> { };
@@ -561,6 +593,11 @@ class FifteenControllerTest {
         @Override
         public void showVictory() {
             this.victories++;
+        }
+
+        @Override
+        public void showIllegalMove() {
+            this.illegalMoves++;
         }
 
         @Override
