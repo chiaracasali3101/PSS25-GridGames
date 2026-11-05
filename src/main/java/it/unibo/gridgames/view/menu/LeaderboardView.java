@@ -20,6 +20,7 @@ public final class LeaderboardView extends BorderPane {
     private static final double LIST_VERTICAL_MARGIN = 10.0;
     private static final double LIST_HORIZONTAL_MARGIN = 20.0;
     private static final double TOP_BOX_SPACING = 10.0;
+    private final Label statsLabel = new Label();
 
     private final Button btnBack = new Button("Indietro");
     private final Label titleLabel = new Label("Classifica");
