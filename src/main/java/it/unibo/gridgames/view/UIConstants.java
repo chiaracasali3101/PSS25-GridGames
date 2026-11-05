@@ -1,6 +1,6 @@
 package it.unibo.gridgames.view;
 
-/** 
+/**
  * UIConstants defines constants used for UI layout and styling.
  */
 
@@ -9,8 +9,10 @@ public enum UIConstants {
     MARGIN_BOTTOM(20),
     FONT_SIZE_TITLE(36),
     GRID_SIZE(10),
-    BUTTON_BACK(15);
-
+    BUTTON_BACK(15),
+    BUTTON_WIDTH(160),
+    CELL_SIZE(30);
+    
     private final int value;
 
     UIConstants(final int value) {
@@ -19,8 +21,8 @@ public enum UIConstants {
 
     /**
      * Returns the integer value associated with the UI constant.
-     * 
-     * @return value 
+     *
+     * @return value
      */
     public int getValue() {
         return value;
