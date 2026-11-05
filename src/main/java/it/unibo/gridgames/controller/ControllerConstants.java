@@ -7,7 +7,8 @@ package it.unibo.gridgames.controller;
 public enum ControllerConstants {
 
     WINDOW_WIDTH(500),
-    WINDOW_HEIGHT(400);
+    WINDOW_HEIGHT(400),
+    MAX_SIZE(5);
 
     private final int value;
 

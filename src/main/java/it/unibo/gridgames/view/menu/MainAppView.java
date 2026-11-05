@@ -17,6 +17,7 @@ import javafx.scene.layout.GridPane;
  */
 public class MainAppView extends BorderPane {
 
+    private final String BUTTON_COLOR = "-fx-background-color: #e67e22; -fx-text-fill: white; -fx-background-radius: 8;";
     // bottoni
     private final Button btn2048 = new Button("2048");
     private final Button btnSudoku = new Button("Sudoku");
@@ -45,17 +46,13 @@ public class MainAppView extends BorderPane {
         grid.setVgap(UIConstants.GRID_SIZE.getValue());
 
         grid.add(btn2048, 0, 0);
-        //btn2048.setStyle("-fx-background-color: darkorange; -fx-text-fill: white; -fx-font-weight: bold;");
-        btn2048.setStyle("-fx-background-color: #e67e22; -fx-text-fill: white; -fx-background-radius: 8;");
+        btn2048.setStyle(BUTTON_COLOR);
         grid.add(btn15Game, 1, 0);
-        //btn15Game.setStyle("-fx-background-color: darkorange; -fx-text-fill: white; -fx-font-weight: bold;");
-        btn15Game.setStyle("-fx-background-color:rgb(229, 166, 111); -fx-text-fill: white; -fx-background-radius: 8;");
+        btn15Game.setStyle(BUTTON_COLOR);
         grid.add(btnSudoku, 0, 1);
-        //btnSudoku.setStyle("-fx-background-color: darkorange; -fx-text-fill: white; -fx-font-weight: bold;");
-        btnSudoku.setStyle("-fx-background-color:rgb(122, 60, 7); -fx-text-fill: white; -fx-background-radius: 8;");
+        btnSudoku.setStyle(BUTTON_COLOR);
         grid.add(btnLeaderboard, 1, 1);
-        //btnLeaderboard.setStyle("-fx-background-color: darkorange; -fx-text-fill: white; -fx-font-weight: bold;");
-        btnLeaderboard.setStyle("-fx-background-color:rgb(240, 158, 85); -fx-text-fill: white; -fx-background-radius: 8;");
+        btnLeaderboard.setStyle(BUTTON_COLOR);
 
         this.setCenter(grid); // gliglia al centro
     }
