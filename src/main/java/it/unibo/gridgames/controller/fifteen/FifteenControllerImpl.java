@@ -2,18 +2,25 @@ package it.unibo.gridgames.controller.fifteen;
 
 import it.unibo.gridgames.model.fifteen.Direction;
 import it.unibo.gridgames.model.fifteen.FifteenGame;
+import it.unibo.gridgames.model.fifteen.FifteenGameImpl;
 import it.unibo.gridgames.model.fifteen.FifteenGameState;
 import it.unibo.gridgames.model.fifteen.FifteenScore;
+import it.unibo.gridgames.model.fifteen.FifteenShufflerImpl;
 import it.unibo.gridgames.model.score.GameRecordImpl;
 import it.unibo.gridgames.model.score.GameType;
 import it.unibo.gridgames.model.timer.GameTimer;
+import it.unibo.gridgames.model.timer.GameTimerImpl;
 import it.unibo.gridgames.persistence.ScoreManager;
 import it.unibo.gridgames.view.fifteen.FifteenView;
+import it.unibo.gridgames.view.fifteen.FifteenViewImpl;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.concurrent.Executor;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.random.RandomGenerator;
+import javafx.application.Platform;
+import javafx.scene.Scene;
 
 /**
  * Default implementation of {@link FifteenController}.
@@ -27,6 +34,25 @@ public final class FifteenControllerImpl implements FifteenController {
     private final GameTimer timer;
     private final Executor uiExecutor;
     private final ScoreManager scoreManager;
+
+    /**
+     * Creates a controller with the real screen, game and timer, ready to be used by the menu.
+     *
+     * @param scene the scene of the application, where the game is shown
+     * @param scoreManager saves the results of the won games
+     * @param onBack the action that leaves the game screen
+     * @throws IllegalArgumentException if an argument is null
+     */
+    public FifteenControllerImpl(final Scene scene, final ScoreManager scoreManager, final Runnable onBack) {
+        this(
+            new FifteenViewImpl(scene),
+            new FifteenGameImpl(new FifteenShufflerImpl(RandomGenerator.getDefault())),
+            new GameTimerImpl(),
+            Platform::runLater,
+            scoreManager,
+            onBack
+        );
+    }
 
     /**
      * Creates a controller and connects it to the view and to the timer.
