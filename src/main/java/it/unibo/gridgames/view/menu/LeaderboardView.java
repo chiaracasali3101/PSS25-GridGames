@@ -6,7 +6,6 @@ import it.unibo.gridgames.model.score.GameRecordImpl;
 import it.unibo.gridgames.view.UIConstants;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.Labeled;
@@ -14,6 +13,8 @@ import javafx.scene.control.ListView;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
 import it.unibo.gridgames.model.score.GameType;
+import it.unibo.gridgames.model.score.ScoreStats;
+import java.util.Map;
 
 /**
  * LeaderboardView represents the user interface for displaying the leaderboard of game scores.
@@ -96,12 +97,18 @@ public final class LeaderboardView extends BorderPane {
         int rank = 1;
         GameType lastGame = null;
 
+        final Map<GameType, Double> averages = ScoreStats.calculateAverage(scores);
         for (final GameRecordImpl record : scores) {
             if (lastGame != record.getGameType()) {
                 if (lastGame != null) {
                     this.scoreListView.getItems().add(""); 
                 }
-                this.scoreListView.getItems().add("=== " + record.getGameType().name() + " ===");
+                final GameType currentGame = record.getGameType();
+                final double avg = averages.getOrDefault(currentGame, 0.0);
+
+                this.scoreListView.getItems().add("=== " + currentGame.name() + " ===");
+                this.scoreListView.getItems().add(String.format("   Media punteggi: %.2f pt", avg));
+                this.scoreListView.getItems().add("----------------------------------------");
                 rank = 1;
                 lastGame = record.getGameType();
             }
@@ -116,6 +123,10 @@ public final class LeaderboardView extends BorderPane {
 
             this.scoreListView.getItems().add(labelText);
             rank++;
+        }
+
+        if (this.statsLabel != null) {
+            ((javafx.scene.control.Labeled) this.statsLabel).setText("");
         }
     }
 }
