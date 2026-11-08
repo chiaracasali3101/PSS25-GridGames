@@ -1,16 +1,22 @@
 package it.unibo.gridgames.view.menu;
 
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import it.unibo.gridgames.view.UIConstants;
+import javafx.beans.binding.Bindings;
+import javafx.geometry.HPos;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.geometry.VPos;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.layout.GridPane;
 //import it.unibo.gridgames.view.UIConstants;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.RowConstraints;
 
 /**
  * Main view of the application, displaying the title and buttons for different games and leaderboard.
@@ -45,14 +51,52 @@ public class MainAppView extends BorderPane {
         grid.setHgap(UIConstants.GRID_SIZE.getValue());
         grid.setVgap(UIConstants.GRID_SIZE.getValue());
 
+        //colonne
+        final ColumnConstraints col1 = new ColumnConstraints();
+        col1.setPercentWidth(50);
+        col1.setHalignment(HPos.CENTER);
+        col1.setHgrow(Priority.ALWAYS);
+
+        final ColumnConstraints col2 = new ColumnConstraints();
+        col2.setPercentWidth(50);
+        col2.setHalignment(HPos.CENTER);
+        col2.setHgrow(Priority.ALWAYS);
+        grid.getColumnConstraints().addAll(col1, col2);
+
+        // rige
+        final RowConstraints row1 = new RowConstraints();
+        row1.setPercentHeight(50);
+        row1.setValignment(VPos.CENTER);
+        row1.setVgrow(Priority.ALWAYS);
+
+        final RowConstraints row2 = new RowConstraints();
+        row2.setPercentHeight(50);
+        row2.setValignment(VPos.CENTER);
+        row2.setVgrow(Priority.ALWAYS);
+        grid.getRowConstraints().addAll(row1, row2);
+
+  
+        grid.maxWidthProperty().bind(this.widthProperty().multiply(0.35));
+        grid.maxHeightProperty().bind(this.heightProperty().multiply(0.25));
+        final Button[] buttons = { btn2048, btn15Game, btnSudoku, btnLeaderboard };
+
+        for (final Button btn : buttons) {
+            btn.setStyle(this.BUTTON_COLOR + " -fx-font-size: 15px; -fx-font-weight: bold;");
+            btn.setMaxWidth(200);
+            btn.setMaxHeight(60);
+            btn.setMinWidth(130);   
+            btn.setMinHeight(45);
+        }
+
+
         grid.add(btn2048, 0, 0);
-        btn2048.setStyle(BUTTON_COLOR);
+        //btn2048.setStyle(BUTTON_COLOR);
         grid.add(btn15Game, 1, 0);
-        btn15Game.setStyle(BUTTON_COLOR);
+        //btn15Game.setStyle(BUTTON_COLOR);
         grid.add(btnSudoku, 0, 1);
-        btnSudoku.setStyle(BUTTON_COLOR);
+        //btnSudoku.setStyle(BUTTON_COLOR);
         grid.add(btnLeaderboard, 1, 1);
-        btnLeaderboard.setStyle(BUTTON_COLOR);
+       // btnLeaderboard.setStyle(BUTTON_COLOR);
 
         this.setCenter(grid); // gliglia al centro
     }

@@ -35,8 +35,14 @@ public final class MainApp extends Application {
 
         stage.setTitle("GridGames");
         stage.setScene(scene);
-        stage.show();
 
+        stage.setWidth(800);
+        stage.setHeight(800);
+        stage.setMinWidth(640);
+        stage.setMinHeight(640);
+        stage.setResizable(true); //ridimensionamento
+
+        stage.show();
     }
 
     /**

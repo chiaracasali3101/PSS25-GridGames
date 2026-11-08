@@ -6,8 +6,10 @@ import it.unibo.gridgames.model.score.GameRecordImpl;
 import it.unibo.gridgames.view.UIConstants;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.Labeled;
 import javafx.scene.control.ListView;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
@@ -33,14 +35,22 @@ public final class LeaderboardView extends BorderPane {
         this.setStyle("-fx-background-color: #f7f9fa;");
 
         this.btnBack.setStyle("-fx-background-color: darkorange; -fx-text-fill: white; -fx-font-weight: bold;");
+        this.btnBack.setMinWidth(120);
+        this.btnBack.prefWidthProperty().bind(this.widthProperty().multiply(0.25));
         this.titleLabel.setStyle("-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #333333;");
+        this.scoreListView.setMaxWidth(Double.MAX_VALUE);
+        this.scoreListView.setMaxHeight(Double.MAX_VALUE);
 
         final VBox topBox = new VBox(TOP_BOX_SPACING);
         topBox.setAlignment(Pos.CENTER);
         topBox.getChildren().add(this.btnBack);
         topBox.getChildren().add(this.titleLabel);
         VBox.setMargin(this.btnBack, new Insets(UIConstants.BUTTON_BACK.getValue()));
+        topBox.setAlignment(Pos.CENTER);
 
+        final VBox bottomBox = new VBox(this.statsLabel);
+        bottomBox.setAlignment(Pos.CENTER);
+        this.setBottom(bottomBox);
         this.setTop(topBox);
 
         BorderPane.setMargin(this.scoreListView, new Insets(
