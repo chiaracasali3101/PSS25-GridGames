@@ -34,17 +34,17 @@ public class MenuController {
         this.scoreManager = Objects.requireNonNull(scoreManager, "ScoreManager cannot be null");
 
         final LeaderboardView leaderboardView = new LeaderboardView(); //pannello grafico per la classifica
-        final LeaderBoardController leaderboardController =
-            new LeaderBoardController(scoreManager, leaderboardView);
+        final LeaderboardController LeaderboardController =
+            new LeaderboardController(scoreManager, leaderboardView);
 
         //carica i dati salvati e popola la vista della classifica
-        leaderboardController.loadAndDisplayScores();
+        LeaderboardController.loadAndDisplayScores();
 
         //configura il tasto 'Indietro' per ripristinare il menu principale
         leaderboardView.setOnBackSelected(() -> this.scene.setRoot(this.view));
 
         this.view.setOnLeaderboardSelected(() -> {
-            leaderboardController.loadAndDisplayScores();
+            LeaderboardController.loadAndDisplayScores();
             this.scene.setRoot(leaderboardView);
         });
 

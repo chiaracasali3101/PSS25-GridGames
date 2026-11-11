@@ -14,18 +14,18 @@ import java.util.ArrayList;
 /**
  * Controller responsible for managing and displaying the leaderboard.
  */
-public final class LeaderBoardController {
+public final class LeaderboardController {
 
     private final ScoreManager scoreManager;
     private final LeaderboardView view;
 
     /**
-     * Constructs a new LeaderBoardController.
+     * Constructs a new LeaderboardController.
      *
      * @param scoreManager the score manager used to retrieve scores
      * @param view the leaderboard view to be updated
      */
-    public LeaderBoardController(final ScoreManager scoreManager, final LeaderboardView view) {
+    public LeaderboardController(final ScoreManager scoreManager, final LeaderboardView view) {
         this.scoreManager = Objects.requireNonNull(scoreManager, "ScoreManager cannot be null");
         this.view = Objects.requireNonNull(view, "LeaderboardView cannot be null");
     }
