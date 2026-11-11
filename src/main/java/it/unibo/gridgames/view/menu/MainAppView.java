@@ -113,7 +113,7 @@ public class MainAppView extends BorderPane {
      * 
      * @param handler sets the action handler for the 15Game button
      */
-    public void setOnGiocoDel15Selected(final Runnable handler) {
+    public void setOnFifteenSelected(final Runnable handler) {
         this.btn15Game.setOnAction(e -> handler.run());
     }
 

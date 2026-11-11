@@ -3,10 +3,16 @@ package it.unibo.gridgames.controller.leaderboard;
 import java.util.Objects;
 
 import it.unibo.gridgames.controller.sudoku.SudokuController;
+import it.unibo.gridgames.controller.fifteen.FifteenController;
+import it.unibo.gridgames.controller.game2048.Game2048Controller;
+import it.unibo.gridgames.controller.game2048.Game2048ControllerImpl;
+import it.unibo.gridgames.controller.fifteen.FifteenController;
+import it.unibo.gridgames.controller.fifteen.FifteenControllerImpl;
 import it.unibo.gridgames.persistence.ScoreManager;
 import it.unibo.gridgames.view.menu.LeaderboardView;
 import it.unibo.gridgames.view.menu.MainAppView;
 import javafx.scene.Scene;
+
 
 /**
  * Controller for handling main menu navigation.
@@ -47,6 +53,16 @@ public class MenuController {
         final SudokuController sudokuController =
             new SudokuController(this.scene, this.scoreManager, () -> this.scene.setRoot(this.view));
         this.view.setOnSudokuSelected(sudokuController::start);
+
+        //2048: il pulsante apre la schermata di gioco
+        final Game2048Controller game2048Controller =
+            new Game2048ControllerImpl(this.scene, this.scoreManager, () -> this.scene.setRoot(this.view));
+        this.view.setOn2048Selected(game2048Controller::start);
+
+         //Gioco del 15: il pulsante apre la schermata di gioco
+         final FifteenController fifteenController =
+            new FifteenControllerImpl(this.scene, this.scoreManager, () -> this.scene.setRoot(this.view));
+        this.view.setOnFifteenSelected(fifteenController::start);
 
         this.scene.setRoot(this.view);
     }
