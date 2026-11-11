@@ -17,11 +17,13 @@ import it.unibo.gridgames.model.score.GameRecordImpl;
 import it.unibo.gridgames.model.score.GameType;
 import it.unibo.gridgames.persistence.ScoreManager;
 import it.unibo.gridgames.view.game2048.Game2048View;
+import it.unibo.gridgames.view.game2048.Game2048ViewImpl;
+import javafx.scene.Scene;
 
 /**
- * Implementation of {@link Game2048Controller}. The first match starts and is
- * shown on creation. Its duration goes from the first valid move to the end of
- * the match.
+ * Implementation of {@link Game2048Controller}. The first match is created and
+ * drawn on creation, but the screen appears only with {@link #start()}. The
+ * duration of a match goes from the first valid move to the end of the match.
  */
 public final class Game2048ControllerImpl implements Game2048Controller {
 
@@ -35,31 +37,43 @@ public final class Game2048ControllerImpl implements Game2048Controller {
     private boolean scoreSaved;
 
     /**
-     * Creates a controller that plays standard matches.
+     * Creates a controller that plays standard matches in the JavaFX window.
      *
-     * @param view the view to update
+     * @param scene the application scene, where the game screen is shown
      * @param scoreManager where the final scores are saved
+     * @param onBackToMenu shows the main menu again
+     * @throws NullPointerException if any argument is null
      */
-    public Game2048ControllerImpl(final Game2048View view, final ScoreManager scoreManager) {
-        this(view, scoreManager, Game2048Impl::new, InstantSource.system());
+    public Game2048ControllerImpl(final Scene scene, final ScoreManager scoreManager, final Runnable onBackToMenu) {
+        this(new Game2048ViewImpl(scene), scoreManager, onBackToMenu, Game2048Impl::new, InstantSource.system());
     }
 
     /**
-     * Creates a controller with custom matches and clock, for example in tests.
+     * Creates a controller with custom view, matches and clock, for example in tests.
      *
      * @param view the view to update
      * @param scoreManager where the final scores are saved
+     * @param onBackToMenu shows the main menu again
      * @param gameFactory creates each new match
      * @param clock the source of the current time
+     * @throws NullPointerException if any argument is null
      */
     public Game2048ControllerImpl(final Game2048View view, final ScoreManager scoreManager,
-            final Supplier<Game2048> gameFactory, final InstantSource clock) {
+            final Runnable onBackToMenu, final Supplier<Game2048> gameFactory, final InstantSource clock) {
         this.view = Objects.requireNonNull(view);
         this.scoreManager = Objects.requireNonNull(scoreManager);
         this.gameFactory = Objects.requireNonNull(gameFactory);
         this.clock = Objects.requireNonNull(clock);
+        this.view.setOnDirectionSelected(this::move);
+        this.view.setOnBackSelected(Objects.requireNonNull(onBackToMenu));
         this.game = gameFactory.get();
         showGame();
+    }
+
+    @Override
+    public void start() {
+        newGame();
+        this.view.show();
     }
 
     @Override

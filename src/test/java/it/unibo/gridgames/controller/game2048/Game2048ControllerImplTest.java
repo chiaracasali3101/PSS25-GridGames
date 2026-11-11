@@ -13,6 +13,7 @@ import java.time.InstantSource;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 import org.junit.jupiter.api.Test;
@@ -57,6 +58,7 @@ class Game2048ControllerImplTest {
     private final FakeView view = new FakeView();
     private final FakeScoreManager scores = new FakeScoreManager();
     private final FakeClock clock = new FakeClock();
+    private final BackToMenu backToMenu = new BackToMenu();
 
     @Test
     void creationShowsTheFirstGame() {
@@ -132,7 +134,7 @@ class Game2048ControllerImplTest {
 
     @Test
     void theViewIsToldWhenTheGameIsLost() {
-        final Game2048Controller controller = new Game2048ControllerImpl(this.view, this.scores,
+        final Game2048Controller controller = new Game2048ControllerImpl(this.view, this.scores, this.backToMenu,
             () -> new Game2048Impl(ONE_MOVE_FROM_GAME_OVER, board -> {
                 board.setValue(0, SIZE - 1, 2);
                 return Optional.empty();
@@ -267,22 +269,61 @@ class Game2048ControllerImplTest {
     }
 
     @Test
+    void startShowsTheScreenWithAFreshGame() {
+        final Game2048Controller controller = controllerOn(START);
+        controller.move(Direction.LEFT);
+
+        controller.start();
+
+        assertEquals(1, this.view.shown);
+        assertArrayEquals(START, this.view.grid);
+        assertEquals(0, this.view.moves);
+    }
+
+    @Test
+    void creationDoesNotShowTheScreen() {
+        controllerOn(START);
+
+        assertEquals(0, this.view.shown);
+    }
+
+    @Test
+    void directionsChosenInTheViewMoveTheTiles() {
+        controllerOn(START);
+
+        this.view.directionListener.accept(Direction.LEFT);
+
+        assertArrayEquals(AFTER_LEFT, this.view.grid);
+    }
+
+    @Test
+    void backInTheViewReturnsToTheMenu() {
+        controllerOn(START);
+
+        this.view.backListener.run();
+
+        assertTrue(this.backToMenu.called);
+    }
+
+    @Test
     void nullArgumentsAreRejected() {
         final Supplier<Game2048> games = Game2048Impl::new;
 
         assertThrows(NullPointerException.class,
-            () -> new Game2048ControllerImpl(null, this.scores, games, this.clock));
+            () -> new Game2048ControllerImpl(null, this.scores, this.backToMenu, games, this.clock));
         assertThrows(NullPointerException.class,
-            () -> new Game2048ControllerImpl(this.view, null, games, this.clock));
+            () -> new Game2048ControllerImpl(this.view, null, this.backToMenu, games, this.clock));
         assertThrows(NullPointerException.class,
-            () -> new Game2048ControllerImpl(this.view, this.scores, null, this.clock));
+            () -> new Game2048ControllerImpl(this.view, this.scores, null, games, this.clock));
         assertThrows(NullPointerException.class,
-            () -> new Game2048ControllerImpl(this.view, this.scores, games, null));
+            () -> new Game2048ControllerImpl(this.view, this.scores, this.backToMenu, null, this.clock));
+        assertThrows(NullPointerException.class,
+            () -> new Game2048ControllerImpl(this.view, this.scores, this.backToMenu, games, null));
     }
 
     // partita reale sulla griglia data, senza tessere casuali
     private Game2048Controller controllerOn(final int[][] grid) {
-        return new Game2048ControllerImpl(this.view, this.scores,
+        return new Game2048ControllerImpl(this.view, this.scores, this.backToMenu,
             () -> new Game2048Impl(grid, board -> Optional.empty()), this.clock);
     }
 
@@ -304,6 +345,24 @@ class Game2048ControllerImplTest {
         private Optional<GameState2048> ended = Optional.empty();
         private boolean scoreSaved;
         private String saveError = "";
+        private int shown;
+        private Consumer<Direction> directionListener = direction -> { };
+        private Runnable backListener = () -> { };
+
+        @Override
+        public void show() {
+            this.shown++;
+        }
+
+        @Override
+        public void setOnDirectionSelected(final Consumer<Direction> listener) {
+            this.directionListener = listener;
+        }
+
+        @Override
+        public void setOnBackSelected(final Runnable listener) {
+            this.backListener = listener;
+        }
 
         @Override
         public void showGame(final int[][] newGrid, final int newScore, final int newMoves) {
@@ -368,6 +427,19 @@ class Game2048ControllerImplTest {
         @Override
         public GameRecordImpl getHighestScore(final GameType gameType) {
             return this.saved.getFirst();
+        }
+    }
+
+    /**
+     * Action that remembers whether the controller asked to go back to the menu.
+     */
+    private static final class BackToMenu implements Runnable {
+
+        private boolean called;
+
+        @Override
+        public void run() {
+            this.called = true;
         }
     }
 

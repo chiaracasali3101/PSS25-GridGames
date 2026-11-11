@@ -1,5 +1,8 @@
 package it.unibo.gridgames.view.game2048;
 
+import java.util.function.Consumer;
+
+import it.unibo.gridgames.model.game2048.Direction;
 import it.unibo.gridgames.model.game2048.GameState2048;
 
 /**
@@ -7,6 +10,25 @@ import it.unibo.gridgames.model.game2048.GameState2048;
  * type, so the controller can be tested without a window.
  */
 public interface Game2048View {
+
+    /**
+     * Puts the game screen in the application window.
+     */
+    void show();
+
+    /**
+     * Sets what to do when the player chooses a direction.
+     *
+     * @param listener called with the chosen direction
+     */
+    void setOnDirectionSelected(Consumer<Direction> listener);
+
+    /**
+     * Sets what to do when the player asks to go back to the menu.
+     *
+     * @param listener called when the player leaves the game screen
+     */
+    void setOnBackSelected(Runnable listener);
 
     /**
      * Draws the current match.

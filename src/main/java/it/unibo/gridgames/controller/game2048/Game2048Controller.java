@@ -8,6 +8,11 @@ import it.unibo.gridgames.model.game2048.Direction;
 public interface Game2048Controller {
 
     /**
+     * Starts a new match and shows the game screen.
+     */
+    void start();
+
+    /**
      * Pushes the tiles in the given direction. The view is redrawn only if the
      * move is valid, and is told when the move ends the match.
      *
