@@ -10,7 +10,6 @@ import it.unibo.gridgames.model.score.GameType;
 import it.unibo.gridgames.persistence.ScoreManager;
 import it.unibo.gridgames.view.menu.LeaderboardView;
 import java.util.ArrayList;
-import it.unibo.gridgames.model.score.GameType;
 
 /**
  * Controller responsible for managing and displaying the leaderboard.
@@ -45,7 +44,7 @@ public final class LeaderBoardController {
             final List<GameRecordImpl> topPerGame = allScores.stream()
                 .filter(record -> record.getGameType() == type)
                 .sorted(Comparator.comparingInt(GameRecordImpl::getScore).reversed())
-                .limit(5)
+                .limit(ControllerConstants.MAX_SIZE.getValue())
                 .toList();
 
             topScoresAllGames.addAll(topPerGame);
