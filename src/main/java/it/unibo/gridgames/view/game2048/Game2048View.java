@@ -45,6 +45,13 @@ public interface Game2048View {
     void onUndoSelected(Runnable listener);
 
     /**
+     * Sets what to do when the player asks to save the score of the finished match.
+     *
+     * @param listener called with the name written by the player
+     */
+    void onSaveSelected(Consumer<String> listener);
+
+    /**
      * Draws the current match.
      *
      * @param grid the cell values indexed by [row][column], where 0 means empty

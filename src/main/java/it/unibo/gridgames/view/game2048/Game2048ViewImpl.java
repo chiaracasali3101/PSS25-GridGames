@@ -5,21 +5,25 @@ import java.util.function.Consumer;
 
 import it.unibo.gridgames.model.game2048.Direction;
 import it.unibo.gridgames.model.game2048.GameState2048;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.TextField;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 
 /**
- * JavaFX screen of the 2048 game: the grid, the score, the moves and the button
- * to go back to the menu. It only shows what the controller asks and notifies
- * the player's choices, without deciding anything.
+ * JavaFX screen of the 2048 game: the grid, the score, the moves, the buttons
+ * to play and, at the end of a match, the field to save the score. Messages are
+ * shown inside the screen, so the window is never blocked. It only shows what
+ * the controller asks and notifies the player's choices, without deciding anything.
  */
 public final class Game2048ViewImpl extends BorderPane implements Game2048View {
 
@@ -33,10 +37,13 @@ public final class Game2048ViewImpl extends BorderPane implements Game2048View {
     private final Game2048Panel panel = new Game2048Panel();
     private final Label info = new Label();
     private final Label message = new Label();
-    private Consumer<Direction> directionListener = direction -> { };
     private final Button backButton = createButton("← Menu");
     private final Button newGameButton = createButton("Nuova partita");
     private final Button undoButton = createButton("Annulla");
+    private final TextField nameField = new TextField();
+    private final Button saveButton = createButton("Salva");
+    private final HBox saveBox = new HBox(MARGIN, this.nameField, this.saveButton);
+    private Consumer<Direction> directionListener = direction -> { };
 
     /**
      * Creates the screen, without showing it.
@@ -49,7 +56,10 @@ public final class Game2048ViewImpl extends BorderPane implements Game2048View {
         this.rootSetter = Objects.requireNonNull(scene)::setRoot;
         this.info.setStyle(INFO_STYLE);
         this.message.setStyle(MESSAGE_STYLE);
-        final VBox top = new VBox(MARGIN, this.info, this.message);
+        this.nameField.setPromptText("Il tuo nome");
+        this.saveBox.setAlignment(Pos.CENTER);
+        setSaveBoxVisible(false);
+        final VBox top = new VBox(MARGIN, this.info, this.message, this.saveBox);
         top.setAlignment(Pos.CENTER);
         top.setPadding(new Insets(MARGIN));
         this.setTop(top);
@@ -87,25 +97,41 @@ public final class Game2048ViewImpl extends BorderPane implements Game2048View {
     }
 
     @Override
+    public void onSaveSelected(final Consumer<String> listener) {
+        Objects.requireNonNull(listener);
+        // si salva sia col bottone sia premendo Invio nel campo del nome
+        final EventHandler<ActionEvent> save = e -> listener.accept(this.nameField.getText());
+        this.saveButton.setOnAction(save);
+        this.nameField.setOnAction(save);
+    }
+
+    @Override
     public void showGame(final int[][] grid, final int score, final int moves) {
         this.panel.showGrid(grid);
         this.info.setText("Punteggio: " + score + "    Mosse: " + moves);
         this.message.setText("");
+        setSaveBoxVisible(false);
     }
 
     @Override
     public void showGameEnded(final GameState2048 result) {
-        this.message.setText(result == GameState2048.WON ? "Hai vinto!" : "Game over: nessuna mossa possibile");
+        this.message.setText((result == GameState2048.WON ? "Hai vinto!" : "Game over: nessuna mossa possibile")
+            + " Scrivi il tuo nome per salvare il punteggio.");
+        setSaveBoxVisible(true);
+        this.nameField.requestFocus();
     }
 
     @Override
     public void showScoreSaved() {
         this.message.setText("Punteggio salvato");
+        setSaveBoxVisible(false);
+        this.requestFocus();
     }
 
     @Override
     public void showSaveError(final String reason) {
         this.message.setText("Salvataggio non riuscito: " + reason);
+        this.nameField.requestFocus();
     }
 
     private HBox createFooter() {
@@ -113,6 +139,12 @@ public final class Game2048ViewImpl extends BorderPane implements Game2048View {
         footer.setAlignment(Pos.CENTER);
         footer.setPadding(new Insets(MARGIN));
         return footer;
+    }
+
+    // nascosto non occupa spazio, così la griglia non si sposta
+    private void setSaveBoxVisible(final boolean visible) {
+        this.saveBox.setVisible(visible);
+        this.saveBox.setManaged(visible);
     }
 
     // dopo il click il focus torna alla schermata, così le frecce restano al gioco
