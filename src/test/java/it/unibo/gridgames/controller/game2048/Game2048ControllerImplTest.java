@@ -10,9 +10,12 @@ import java.io.IOException;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.InstantSource;
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Queue;
+import java.util.concurrent.Executor;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
@@ -59,6 +62,8 @@ class Game2048ControllerImplTest {
     private final FakeScoreManager scores = new FakeScoreManager();
     private final FakeClock clock = new FakeClock();
     private final BackToMenu backToMenu = new BackToMenu();
+    private final QueuedExecutor background = new QueuedExecutor();
+    private final QueuedExecutor ui = new QueuedExecutor();
 
     @Test
     void creationShowsTheFirstGame() {
@@ -138,7 +143,7 @@ class Game2048ControllerImplTest {
             () -> new Game2048Impl(ONE_MOVE_FROM_GAME_OVER, board -> {
                 board.setValue(0, SIZE - 1, 2);
                 return Optional.empty();
-            }), this.clock);
+            }), this.clock, Runnable::run, Runnable::run);
 
         controller.move(Direction.LEFT);
 
@@ -339,25 +344,97 @@ class Game2048ControllerImplTest {
     }
 
     @Test
-    void nullArgumentsAreRejected() {
-        final Supplier<Game2048> games = Game2048Impl::new;
+    void theScoreIsWrittenInTheBackgroundAndShownOnTheUiThread() {
+        final Game2048Controller controller = controllerWithQueuesOn(WINNABLE);
+        controller.move(Direction.LEFT);
 
-        assertThrows(NullPointerException.class,
-            () -> new Game2048ControllerImpl(null, this.scores, this.backToMenu, games, this.clock));
-        assertThrows(NullPointerException.class,
-            () -> new Game2048ControllerImpl(this.view, null, this.backToMenu, games, this.clock));
-        assertThrows(NullPointerException.class,
-            () -> new Game2048ControllerImpl(this.view, this.scores, null, games, this.clock));
-        assertThrows(NullPointerException.class,
-            () -> new Game2048ControllerImpl(this.view, this.scores, this.backToMenu, null, this.clock));
-        assertThrows(NullPointerException.class,
-            () -> new Game2048ControllerImpl(this.view, this.scores, this.backToMenu, games, null));
+        controller.saveScore(PLAYER);
+
+        assertTrue(this.scores.saved.isEmpty());
+        this.background.runAll();
+        assertEquals(1, this.scores.saved.size());
+        assertFalse(this.view.scoreSaved);
+        this.ui.runAll();
+        assertTrue(this.view.scoreSaved);
     }
 
-    // partita reale sulla griglia data, senza tessere casuali
+    @Test
+    void aBackgroundFailureIsShownOnTheUiThread() {
+        final Game2048Controller controller = controllerWithQueuesOn(WINNABLE);
+        controller.move(Direction.LEFT);
+        this.scores.failing = true;
+
+        controller.saveScore(PLAYER);
+        this.background.runAll();
+
+        assertTrue(this.view.saveError.isEmpty());
+        this.ui.runAll();
+        assertEquals(DISK_ERROR, this.view.saveError);
+    }
+
+    @Test
+    void aSaveRequestedWhileSavingIsIgnored() {
+        final Game2048Controller controller = controllerWithQueuesOn(WINNABLE);
+        controller.move(Direction.LEFT);
+
+        controller.saveScore(PLAYER);
+        controller.saveScore(PLAYER);
+        this.background.runAll();
+        this.ui.runAll();
+
+        assertEquals(1, this.scores.saved.size());
+    }
+
+    @Test
+    void aSaveEndingAfterANewGameDoesNotAffectTheNewGame() {
+        final Game2048Controller controller = controllerWithQueuesOn(WINNABLE);
+        controller.move(Direction.LEFT);
+        controller.saveScore(PLAYER);
+
+        controller.newGame();
+        this.background.runAll();
+        this.ui.runAll();
+
+        assertFalse(this.view.scoreSaved);
+        controller.move(Direction.LEFT);
+        controller.saveScore(PLAYER);
+        this.background.runAll();
+        this.ui.runAll();
+        assertEquals(2, this.scores.saved.size());
+        assertTrue(this.view.scoreSaved);
+    }
+
+    @Test
+    void nullArgumentsAreRejected() {
+        final Supplier<Game2048> games = Game2048Impl::new;
+        final Executor now = Runnable::run;
+
+        assertThrows(NullPointerException.class,
+            () -> new Game2048ControllerImpl(null, this.scores, this.backToMenu, games, this.clock, now, now));
+        assertThrows(NullPointerException.class,
+            () -> new Game2048ControllerImpl(this.view, null, this.backToMenu, games, this.clock, now, now));
+        assertThrows(NullPointerException.class,
+            () -> new Game2048ControllerImpl(this.view, this.scores, null, games, this.clock, now, now));
+        assertThrows(NullPointerException.class,
+            () -> new Game2048ControllerImpl(this.view, this.scores, this.backToMenu, null, this.clock, now, now));
+        assertThrows(NullPointerException.class,
+            () -> new Game2048ControllerImpl(this.view, this.scores, this.backToMenu, games, null, now, now));
+        assertThrows(NullPointerException.class,
+            () -> new Game2048ControllerImpl(this.view, this.scores, this.backToMenu, games, this.clock, null, now));
+        assertThrows(NullPointerException.class,
+            () -> new Game2048ControllerImpl(this.view, this.scores, this.backToMenu, games, this.clock, now, null));
+    }
+
+    // partita reale sulla griglia data, senza tessere casuali; salvataggio immediato
     private Game2048Controller controllerOn(final int[][] grid) {
         return new Game2048ControllerImpl(this.view, this.scores, this.backToMenu,
-            () -> new Game2048Impl(grid, board -> Optional.empty()), this.clock);
+            () -> new Game2048Impl(grid, board -> Optional.empty()), this.clock, Runnable::run, Runnable::run);
+    }
+
+    // come controllerOn, ma il salvataggio e l'aggiornamento della view aspettano runAll()
+    private Game2048Controller controllerWithQueuesOn(final int[][] grid) {
+        return new Game2048ControllerImpl(this.view, this.scores, this.backToMenu,
+            () -> new Game2048Impl(grid, board -> Optional.empty()), this.clock, this.background, this.ui);
     }
 
     private static int[][] topRow(final int... values) {
@@ -491,6 +568,25 @@ class Game2048ControllerImplTest {
         @Override
         public void run() {
             this.called = true;
+        }
+    }
+
+    /**
+     * Executor that keeps the tasks until the test runs them, to simulate another thread.
+     */
+    private static final class QueuedExecutor implements Executor {
+
+        private final Queue<Runnable> tasks = new ArrayDeque<>();
+
+        @Override
+        public void execute(final Runnable task) {
+            this.tasks.add(task);
+        }
+
+        private void runAll() {
+            while (!this.tasks.isEmpty()) {
+                this.tasks.remove().run();
+            }
         }
     }
 
