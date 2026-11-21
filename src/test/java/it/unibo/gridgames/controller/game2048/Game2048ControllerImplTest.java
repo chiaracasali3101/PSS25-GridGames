@@ -306,6 +306,28 @@ class Game2048ControllerImplTest {
     }
 
     @Test
+    void newGameInTheViewStartsAFreshGame() {
+        final Game2048Controller controller = controllerOn(START);
+        controller.move(Direction.LEFT);
+
+        this.view.newGameListener.run();
+
+        assertArrayEquals(START, this.view.grid);
+        assertEquals(0, this.view.moves);
+    }
+
+    @Test
+    void undoInTheViewTakesBackTheLastMove() {
+        final Game2048Controller controller = controllerOn(START);
+        controller.move(Direction.LEFT);
+
+        this.view.undoListener.run();
+
+        assertArrayEquals(START, this.view.grid);
+        assertEquals(0, this.view.score);
+    }
+
+    @Test
     void nullArgumentsAreRejected() {
         final Supplier<Game2048> games = Game2048Impl::new;
 
@@ -348,6 +370,8 @@ class Game2048ControllerImplTest {
         private int shown;
         private Consumer<Direction> directionListener = direction -> { };
         private Runnable backListener = () -> { };
+        private Runnable newGameListener = () -> { };
+        private Runnable undoListener = () -> { };
 
         @Override
         public void show() {
@@ -355,12 +379,22 @@ class Game2048ControllerImplTest {
         }
 
         @Override
-        public void setOnDirectionSelected(final Consumer<Direction> listener) {
+        public void onNewGameSelected(final Runnable listener) {
+            this.newGameListener = listener;
+        }
+
+        @Override
+        public void onUndoSelected(final Runnable listener) {
+            this.undoListener = listener;
+        }
+
+        @Override
+        public void onDirectionSelected(final Consumer<Direction> listener) {
             this.directionListener = listener;
         }
 
         @Override
-        public void setOnBackSelected(final Runnable listener) {
+        public void onBackSelected(final Runnable listener) {
             this.backListener = listener;
         }
 
