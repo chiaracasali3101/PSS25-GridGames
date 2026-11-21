@@ -34,7 +34,9 @@ public final class Game2048ViewImpl extends BorderPane implements Game2048View {
     private final Label info = new Label();
     private final Label message = new Label();
     private Consumer<Direction> directionListener = direction -> { };
-    private Runnable backListener = () -> { };
+    private final Button backButton = createButton("← Menu");
+    private final Button newGameButton = createButton("Nuova partita");
+    private final Button undoButton = createButton("Annulla");
 
     /**
      * Creates the screen, without showing it.
@@ -65,13 +67,23 @@ public final class Game2048ViewImpl extends BorderPane implements Game2048View {
     }
 
     @Override
-    public void setOnDirectionSelected(final Consumer<Direction> listener) {
+    public void onDirectionSelected(final Consumer<Direction> listener) {
         this.directionListener = Objects.requireNonNull(listener);
     }
 
     @Override
-    public void setOnBackSelected(final Runnable listener) {
-        this.backListener = Objects.requireNonNull(listener);
+    public void onBackSelected(final Runnable listener) {
+        setAction(this.backButton, listener);
+    }
+
+    @Override
+    public void onNewGameSelected(final Runnable listener) {
+        setAction(this.newGameButton, listener);
+    }
+
+    @Override
+    public void onUndoSelected(final Runnable listener) {
+        setAction(this.undoButton, listener);
     }
 
     @Override
@@ -97,12 +109,26 @@ public final class Game2048ViewImpl extends BorderPane implements Game2048View {
     }
 
     private HBox createFooter() {
-        final Button back = new Button("← Menu");
-        back.setStyle(BUTTON_STYLE);
-        back.setOnAction(e -> this.backListener.run());
-        final HBox footer = new HBox(back);
-        footer.setAlignment(Pos.CENTER_LEFT);
+        final HBox footer = new HBox(MARGIN, this.backButton, this.newGameButton, this.undoButton);
+        footer.setAlignment(Pos.CENTER);
         footer.setPadding(new Insets(MARGIN));
         return footer;
+    }
+
+    // dopo il click il focus torna alla schermata, così le frecce restano al gioco
+    private void setAction(final Button button, final Runnable listener) {
+        Objects.requireNonNull(listener);
+        button.setOnAction(e -> {
+            listener.run();
+            this.requestFocus();
+        });
+    }
+
+    // i bottoni non prendono il focus con le frecce/tab
+    private static Button createButton(final String text) {
+        final Button button = new Button(text);
+        button.setStyle(BUTTON_STYLE);
+        button.setFocusTraversable(false);
+        return button;
     }
 }

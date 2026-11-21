@@ -21,14 +21,28 @@ public interface Game2048View {
      *
      * @param listener called with the chosen direction
      */
-    void setOnDirectionSelected(Consumer<Direction> listener);
+    void onDirectionSelected(Consumer<Direction> listener);
 
     /**
      * Sets what to do when the player asks to go back to the menu.
      *
      * @param listener called when the player leaves the game screen
      */
-    void setOnBackSelected(Runnable listener);
+    void onBackSelected(Runnable listener);
+
+    /**
+     * Sets what to do when the player asks for a new match.
+     *
+     * @param listener called when the player wants to start over
+     */
+    void onNewGameSelected(Runnable listener);
+
+    /**
+     * Sets what to do when the player asks to take back the last move.
+     *
+     * @param listener called when the player wants to undo a move
+     */
+    void onUndoSelected(Runnable listener);
 
     /**
      * Draws the current match.

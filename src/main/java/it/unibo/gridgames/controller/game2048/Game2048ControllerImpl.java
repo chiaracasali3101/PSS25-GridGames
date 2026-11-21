@@ -64,8 +64,10 @@ public final class Game2048ControllerImpl implements Game2048Controller {
         this.scoreManager = Objects.requireNonNull(scoreManager);
         this.gameFactory = Objects.requireNonNull(gameFactory);
         this.clock = Objects.requireNonNull(clock);
-        this.view.setOnDirectionSelected(this::move);
-        this.view.setOnBackSelected(Objects.requireNonNull(onBackToMenu));
+        this.view.onDirectionSelected(this::move);
+        this.view.onBackSelected(Objects.requireNonNull(onBackToMenu));
+        this.view.onNewGameSelected(this::newGame);
+        this.view.onUndoSelected(this::undo);
         this.game = gameFactory.get();
         showGame();
     }
