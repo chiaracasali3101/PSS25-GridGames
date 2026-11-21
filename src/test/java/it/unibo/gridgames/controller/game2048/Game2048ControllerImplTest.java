@@ -328,6 +328,17 @@ class Game2048ControllerImplTest {
     }
 
     @Test
+    void theNameEnteredInTheViewSavesTheFinishedGame() {
+        final Game2048Controller controller = controllerOn(WINNABLE);
+        controller.move(Direction.LEFT);
+
+        this.view.saveListener.accept(PLAYER);
+
+        assertEquals(PLAYER, this.scores.saved.getFirst().getPlayerName());
+        assertTrue(this.view.scoreSaved);
+    }
+
+    @Test
     void nullArgumentsAreRejected() {
         final Supplier<Game2048> games = Game2048Impl::new;
 
@@ -372,10 +383,16 @@ class Game2048ControllerImplTest {
         private Runnable backListener = () -> { };
         private Runnable newGameListener = () -> { };
         private Runnable undoListener = () -> { };
+        private Consumer<String> saveListener = name -> { };
 
         @Override
         public void show() {
             this.shown++;
+        }
+
+        @Override
+        public void onSaveSelected(final Consumer<String> listener) {
+            this.saveListener = listener;
         }
 
         @Override
