@@ -14,7 +14,7 @@ public record MergeResult(int[] line, int points) {
      * Creates a new result. The line is copied.
      */
     public MergeResult {
-        line = Objects.requireNonNull(line).clone();
+        line = Objects.requireNonNull(line, "line cannot be null").clone();
     }
 
     /**

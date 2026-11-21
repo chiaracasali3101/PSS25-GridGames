@@ -32,6 +32,7 @@ public final class Game2048ViewImpl extends BorderPane implements Game2048View {
         "-fx-background-color: #e67e22; -fx-text-fill: white; -fx-background-radius: 8;";
     private static final String INFO_STYLE = "-fx-font-size: 16;";
     private static final String MESSAGE_STYLE = "-fx-font-size: 16; -fx-font-weight: bold;";
+    private static final String LISTENER_NO_NULL = "listener cannot be null";
 
     private final Consumer<Parent> rootSetter;
     private final Game2048Panel panel = new Game2048Panel();
@@ -53,7 +54,7 @@ public final class Game2048ViewImpl extends BorderPane implements Game2048View {
      */
     public Game2048ViewImpl(final Scene scene) {
         super();
-        this.rootSetter = Objects.requireNonNull(scene)::setRoot;
+        this.rootSetter = Objects.requireNonNull(scene, "scene cannot be null")::setRoot;
         this.info.setStyle(INFO_STYLE);
         this.message.setStyle(MESSAGE_STYLE);
         this.nameField.setPromptText("Il tuo nome");
@@ -78,7 +79,7 @@ public final class Game2048ViewImpl extends BorderPane implements Game2048View {
 
     @Override
     public void onDirectionSelected(final Consumer<Direction> listener) {
-        this.directionListener = Objects.requireNonNull(listener);
+        this.directionListener = Objects.requireNonNull(listener, LISTENER_NO_NULL);
     }
 
     @Override
@@ -98,7 +99,7 @@ public final class Game2048ViewImpl extends BorderPane implements Game2048View {
 
     @Override
     public void onSaveSelected(final Consumer<String> listener) {
-        Objects.requireNonNull(listener);
+        Objects.requireNonNull(listener, LISTENER_NO_NULL);
         // si salva sia col bottone sia premendo Invio nel campo del nome
         final EventHandler<ActionEvent> save = e -> listener.accept(this.nameField.getText());
         this.saveButton.setOnAction(save);
@@ -149,7 +150,7 @@ public final class Game2048ViewImpl extends BorderPane implements Game2048View {
 
     // dopo il click il focus torna alla schermata, così le frecce restano al gioco
     private void setAction(final Button button, final Runnable listener) {
-        Objects.requireNonNull(listener);
+        Objects.requireNonNull(listener, LISTENER_NO_NULL);
         button.setOnAction(e -> {
             listener.run();
             this.requestFocus();

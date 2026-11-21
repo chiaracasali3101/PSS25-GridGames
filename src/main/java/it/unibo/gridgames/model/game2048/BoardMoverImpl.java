@@ -15,8 +15,8 @@ public final class BoardMoverImpl implements BoardMover {
 
     @Override
     public MoveResult move(final Board board, final Direction direction) {
-        Objects.requireNonNull(board);
-        Objects.requireNonNull(direction);
+        Objects.requireNonNull(board, "board cannot be null");
+        Objects.requireNonNull(direction, "direction cannot be null");
         final int size = board.getSize();
         boolean changed = false;
         int points = 0;

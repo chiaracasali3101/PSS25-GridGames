@@ -31,7 +31,7 @@ public final class TileSpawnerImpl implements TileSpawner {
      * @param random the source of randomness, for example a seeded one in tests
      */
     public TileSpawnerImpl(final RandomGenerator random) {
-        this.random = Objects.requireNonNull(random);
+        this.random = Objects.requireNonNull(random, "random cannot be null");
     }
 
     @Override

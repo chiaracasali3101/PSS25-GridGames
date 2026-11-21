@@ -37,6 +37,7 @@ public final class Game2048Impl implements Game2048 {
     public Game2048Impl(final TileSpawner spawner) {
         this(new int[SIZE][SIZE], spawner);
         for (int i = 0; i < INITIAL_TILES; i++) {
+            // la nuova tessera compare solo se la mossa ha cambiato la griglia
             this.spawner.spawn(this.board);
         }
     }
@@ -51,21 +52,23 @@ public final class Game2048Impl implements Game2048 {
      */
     public Game2048Impl(final int[][] grid, final TileSpawner spawner) {
         this.board = new BoardImpl(grid);
-        this.spawner = Objects.requireNonNull(spawner);
+        this.spawner = Objects.requireNonNull(spawner, "spawner cannot be null");
     }
 
     @Override
     public boolean move(final Direction direction) {
-        Objects.requireNonNull(direction);
+        Objects.requireNonNull(direction, "direction cannot be null");
         if (getState() != GameState2048.PLAYING) {
             return false;
         }
+        // copia della partita prima della mossa, per poterla annullare
         final Snapshot beforeMove = new Snapshot(new BoardImpl(this.board.toMatrix()), this.score, this.moves);
         final MoveResult result = this.mover.move(this.board, direction);
         if (result.changed()) {
             this.undoPoint = Optional.of(beforeMove);
             this.score += result.points();
             this.moves++;
+            // la nuova tessera compare solo se la mossa ha cambiato la griglia
             this.spawner.spawn(this.board);
         }
         return result.changed();

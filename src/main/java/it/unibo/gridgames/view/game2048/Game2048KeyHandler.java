@@ -38,7 +38,7 @@ public final class Game2048KeyHandler implements EventHandler<KeyEvent> {
      * @throws NullPointerException if onDirection is null
      */
     public Game2048KeyHandler(final Consumer<Direction> onDirection) {
-        this.onDirection = Objects.requireNonNull(onDirection);
+        this.onDirection = Objects.requireNonNull(onDirection, "onDirection cannot be null");
     }
 
     @Override

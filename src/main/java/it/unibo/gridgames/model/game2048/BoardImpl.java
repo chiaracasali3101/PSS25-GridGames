@@ -36,7 +36,7 @@ public final class BoardImpl implements Board {
      * @throws IllegalArgumentException if the matrix is empty, not square or contains invalid values
      */
     public BoardImpl(final int[][] matrix) {
-        this(Objects.requireNonNull(matrix).length);
+        this(Objects.requireNonNull(matrix, "matrix cannot be null").length);
         for (int row = 0; row < this.size; row++) {
             if (matrix[row].length != this.size) {
                 throw new IllegalArgumentException("Matrix must be square");
