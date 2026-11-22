@@ -1,5 +1,6 @@
 package it.unibo.gridgames.view.game2048;
 
+import java.time.Duration;
 import java.util.function.Consumer;
 
 import it.unibo.gridgames.model.game2048.Direction;
@@ -59,6 +60,13 @@ public interface Game2048View {
      * @param moves the number of valid moves made so far
      */
     void showGame(int[][] grid, int score, int moves);
+
+    /**
+     * Shows how long the current match has lasted.
+     *
+     * @param elapsed the time measured so far
+     */
+    void showTime(Duration elapsed);
 
     /**
      * Tells the player that the match is over and asks for the name to save the score.

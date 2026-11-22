@@ -1,5 +1,7 @@
 package it.unibo.gridgames.view.game2048;
 
+import java.time.Duration;
+import java.util.Locale;
 import java.util.Objects;
 import java.util.function.Consumer;
 
@@ -20,7 +22,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 
 /**
- * JavaFX screen of the 2048 game: the grid, the score, the moves, the buttons
+ * JavaFX screen of the 2048 game: the grid, the score, the moves, the time, the buttons
  * to play and, at the end of a match, the field to save the score. Messages are
  * shown inside the screen, so the window is never blocked. It only shows what
  * the controller asks and notifies the player's choices, without deciding anything.
@@ -28,6 +30,7 @@ import javafx.scene.layout.VBox;
 public final class Game2048ViewImpl extends BorderPane implements Game2048View {
 
     private static final double MARGIN = 10;
+    private static final long SECONDS_PER_MINUTE = 60;
     private static final String BUTTON_STYLE =
         "-fx-background-color: #e67e22; -fx-text-fill: white; -fx-background-radius: 8;";
     private static final String INFO_STYLE = "-fx-font-size: 16;";
@@ -37,6 +40,7 @@ public final class Game2048ViewImpl extends BorderPane implements Game2048View {
     private final Consumer<Parent> rootSetter;
     private final Game2048Panel panel = new Game2048Panel();
     private final Label info = new Label();
+    private final Label time = new Label();
     private final Label message = new Label();
     private final Button backButton = createButton("← Menu");
     private final Button newGameButton = createButton("Nuova partita");
@@ -56,11 +60,14 @@ public final class Game2048ViewImpl extends BorderPane implements Game2048View {
         super();
         this.rootSetter = Objects.requireNonNull(scene, "scene cannot be null")::setRoot;
         this.info.setStyle(INFO_STYLE);
+        this.time.setStyle(INFO_STYLE);
         this.message.setStyle(MESSAGE_STYLE);
         this.nameField.setPromptText("Il tuo nome");
         this.saveBox.setAlignment(Pos.CENTER);
         setSaveBoxVisible(false);
-        final VBox top = new VBox(MARGIN, this.info, this.message, this.saveBox);
+        final HBox stats = new HBox(MARGIN, this.info, this.time);
+        stats.setAlignment(Pos.CENTER);
+        final VBox top = new VBox(MARGIN, stats, this.message, this.saveBox);
         top.setAlignment(Pos.CENTER);
         top.setPadding(new Insets(MARGIN));
         this.setTop(top);
@@ -112,6 +119,13 @@ public final class Game2048ViewImpl extends BorderPane implements Game2048View {
         this.info.setText("Punteggio: " + score + "    Mosse: " + moves);
         this.message.setText("");
         setSaveBoxVisible(false);
+    }
+
+    @Override
+    public void showTime(final Duration elapsed) {
+        final long seconds = elapsed.toSeconds();
+        this.time.setText(String.format(Locale.ROOT, "Tempo: %02d:%02d",
+            seconds / SECONDS_PER_MINUTE, seconds % SECONDS_PER_MINUTE));
     }
 
     @Override
