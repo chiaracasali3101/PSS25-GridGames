@@ -11,6 +11,13 @@ public final class LineMergerImpl implements LineMerger {
 
     private static final int EMPTY = 0;
 
+    /**
+     * Creates a merger that follows the standard 2048 rules.
+     */
+    public LineMergerImpl() {
+        // nessuno stato: ogni riga è elaborata in modo indipendente
+    }
+
     @Override
     public MergeResult merge(final int[] line) {
         final int[] tiles = Arrays.stream(Objects.requireNonNull(line, "line cannot be null"))

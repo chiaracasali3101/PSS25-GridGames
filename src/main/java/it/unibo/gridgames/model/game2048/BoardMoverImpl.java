@@ -13,6 +13,13 @@ public final class BoardMoverImpl implements BoardMover {
 
     private final LineMerger merger = new LineMergerImpl();
 
+    /**
+     * Creates a mover that follows the standard 2048 rules.
+     */
+    public BoardMoverImpl() {
+        // nessuna configurazione: il merger è creato con il campo
+    }
+
     @Override
     public MoveResult move(final Board board, final Direction direction) {
         Objects.requireNonNull(board, "board cannot be null");
