@@ -1,6 +1,7 @@
 package it.unibo.gridgames.controller.leaderboard;
 
 import java.util.Objects;
+import javafx.scene.Scene;
 
 import it.unibo.gridgames.controller.sudoku.SudokuController;
 import it.unibo.gridgames.controller.fifteen.FifteenController;
@@ -10,12 +11,9 @@ import it.unibo.gridgames.controller.fifteen.FifteenControllerImpl;
 import it.unibo.gridgames.persistence.ScoreManager;
 import it.unibo.gridgames.view.menu.LeaderboardView;
 import it.unibo.gridgames.view.menu.MainAppView;
-import javafx.scene.Scene;
-
 
 /**
- * 
- *Controller for handling main menu navigation.
+ * Controller for handling main menu navigation.
  */
 public class MenuController {
     private final MainAppView view;
@@ -23,7 +21,7 @@ public class MenuController {
     private final ScoreManager scoreManager;
 
     /**
-     * Construct Menu Controller.
+     * Constructs a new MenuController.
      *
      * @param view the main app view
      * @param scene the application scene

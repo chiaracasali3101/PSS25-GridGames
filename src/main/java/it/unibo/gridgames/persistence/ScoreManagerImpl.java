@@ -26,7 +26,7 @@ import com.google.gson.JsonSerializer;
  * provides functionality to save and load game scores from a file.
  * It uses a file path to store the scores and provides methods to save a score,
  * load all scores, get top scores, get the number of games played, get the
- * average score, and
+ * average score, and and highest score per game type.
  */
 
 public class ScoreManagerImpl implements ScoreManager {
@@ -49,9 +49,11 @@ public class ScoreManagerImpl implements ScoreManager {
     }
 
     /**
-     * View Score.
-     * 
-     * @param filePath score
+     * Constructs a new {@code ScoreManagerImpl} backed by the specified file path.
+     *
+     * @param filePath the path to the JSON file used to store game scores
+     * @throws NullPointerException if {@code filePath} is null
+     * @throws NullPointerException if {@code record} is null
      */
     public ScoreManagerImpl(final Path filePath) {
         this.filePath = Objects.requireNonNull(filePath, "filePath cannot be null");

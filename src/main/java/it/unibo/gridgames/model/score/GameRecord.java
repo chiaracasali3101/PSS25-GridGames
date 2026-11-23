@@ -6,7 +6,6 @@ import java.time.LocalDateTime;
 
 /**
  * Represents a record of a game played by a player.
- * GameRecord.
  */
 public interface GameRecord {
     /**
@@ -26,7 +25,7 @@ public interface GameRecord {
     /**
      * Returns the type of game associated with this game record.
      * 
-     * @return game type (e.g., 2048, Sudoku, 15Game)
+     * @return game type (e.g., 2048, Sudoku, fifteen)
      */
     GameType getGameType();
 

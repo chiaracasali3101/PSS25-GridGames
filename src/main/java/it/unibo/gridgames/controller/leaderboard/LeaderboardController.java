@@ -1,5 +1,6 @@
 package it.unibo.gridgames.controller.leaderboard;
 
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
@@ -9,7 +10,6 @@ import it.unibo.gridgames.model.score.GameRecordImpl;
 import it.unibo.gridgames.model.score.GameType;
 import it.unibo.gridgames.persistence.ScoreManager;
 import it.unibo.gridgames.view.menu.LeaderboardView;
-import java.util.ArrayList;
 
 /**
  * Controller responsible for managing and displaying the leaderboard.
@@ -31,7 +31,7 @@ public final class LeaderboardController {
     }
 
     /**
-     * Loads the scores from persistence, filters the top entries for Sudoku,
+     * Filters the top entries for each game type
      * and updates the view with the results.
      */
     public void loadAndDisplayScores() {
