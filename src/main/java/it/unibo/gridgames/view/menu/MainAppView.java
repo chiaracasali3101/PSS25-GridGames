@@ -73,7 +73,6 @@ public class MainAppView extends BorderPane {
         row2.setVgrow(Priority.ALWAYS);
         grid.getRowConstraints().addAll(row1, row2);
 
-  
         grid.maxWidthProperty().bind(this.widthProperty().multiply(0.35));
         grid.maxHeightProperty().bind(this.heightProperty().multiply(0.25));
         final Button[] buttons = { btn2048, btn15Game, btnSudoku, btnLeaderboard };
@@ -82,10 +81,9 @@ public class MainAppView extends BorderPane {
             btn.setStyle(this.BUTTON_COLOR + " -fx-font-size: 15px; -fx-font-weight: bold;");
             btn.setMaxWidth(200);
             btn.setMaxHeight(60);
-            btn.setMinWidth(130);   
+            btn.setMinWidth(130);
             btn.setMinHeight(45);
         }
-
 
         grid.add(btn2048, 0, 0);
         //btn2048.setStyle(BUTTON_COLOR);
