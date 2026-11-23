@@ -73,7 +73,10 @@ public class ScoreManagerImpl implements ScoreManager {
             currentScores.add(record);
 
             if (this.filePath.getParent() != null) {
-                Files.createDirectories(this.filePath.getParent());
+                final Path parent = this.filePath.getParent();
+                if (parent != null) {
+                    Files.createDirectories(parent);
+                }
             }
 
             //sovrascrive json

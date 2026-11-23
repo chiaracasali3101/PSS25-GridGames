@@ -14,6 +14,7 @@ import javafx.scene.Scene;
 
 
 /**
+ * 
  *Controller for handling main menu navigation.
  */
 public class MenuController {
