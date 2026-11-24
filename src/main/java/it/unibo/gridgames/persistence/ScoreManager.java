@@ -28,7 +28,6 @@ public interface ScoreManager {
      * Loads all game score records from storage.
      * 
      * @return a list of all game records
-     * @throws IOException if an error occurs while reading from storage
      */
     // riapre il file e converte tutti i record in oggetti GameRecordImpl
     // restituendo la lista

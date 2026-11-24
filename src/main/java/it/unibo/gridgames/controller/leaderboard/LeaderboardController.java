@@ -10,23 +10,22 @@ import it.unibo.gridgames.model.score.GameType;
 import it.unibo.gridgames.persistence.ScoreManager;
 import it.unibo.gridgames.view.menu.LeaderboardView;
 import java.util.ArrayList;
-import it.unibo.gridgames.model.score.GameType;
 
 /**
  * Controller responsible for managing and displaying the leaderboard.
  */
-public final class LeaderBoardController {
+public final class LeaderboardController {
 
     private final ScoreManager scoreManager;
     private final LeaderboardView view;
 
     /**
-     * Constructs a new LeaderBoardController.
+     * Constructs a new LeaderboardController.
      *
      * @param scoreManager the score manager used to retrieve scores
      * @param view the leaderboard view to be updated
      */
-    public LeaderBoardController(final ScoreManager scoreManager, final LeaderboardView view) {
+    public LeaderboardController(final ScoreManager scoreManager, final LeaderboardView view) {
         this.scoreManager = Objects.requireNonNull(scoreManager, "ScoreManager cannot be null");
         this.view = Objects.requireNonNull(view, "LeaderboardView cannot be null");
     }
@@ -45,7 +44,7 @@ public final class LeaderBoardController {
             final List<GameRecordImpl> topPerGame = allScores.stream()
                 .filter(record -> record.getGameType() == type)
                 .sorted(Comparator.comparingInt(GameRecordImpl::getScore).reversed())
-                .limit(5)
+                .limit(ControllerConstants.MAX_SIZE.getValue())
                 .toList();
 
             topScoresAllGames.addAll(topPerGame);
