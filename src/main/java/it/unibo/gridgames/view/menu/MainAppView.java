@@ -21,7 +21,7 @@ import javafx.scene.layout.RowConstraints;
  */
 public class MainAppView extends BorderPane {
 
-    private final String BUTTON_COLOR = "-fx-background-color: #e67e22; -fx-text-fill: white; -fx-background-radius: 8;";
+    private static final String BUTTON_COLOR = "-fx-background-color: #e67e22; -fx-text-fill: white; -fx-background-radius: 8;";
     // bottoni
     private final Button btn2048 = new Button("2048");
     private final Button btnSudoku = new Button("Sudoku");
@@ -75,7 +75,7 @@ public class MainAppView extends BorderPane {
 
         grid.maxWidthProperty().bind(this.widthProperty().multiply(0.35));
         grid.maxHeightProperty().bind(this.heightProperty().multiply(0.25));
-        final Button[] buttons = { btn2048, btn15Game, btnSudoku, btnLeaderboard };
+        final Button[] buttons = {btn2048, btn15Game, btnSudoku, btnLeaderboard};
 
         for (final Button btn : buttons) {
             btn.setStyle(this.BUTTON_COLOR + " -fx-font-size: 15px; -fx-font-weight: bold;");
@@ -92,7 +92,7 @@ public class MainAppView extends BorderPane {
         grid.add(btnSudoku, 0, 1);
         //btnSudoku.setStyle(BUTTON_COLOR);
         grid.add(btnLeaderboard, 1, 1);
-       // btnLeaderboard.setStyle(BUTTON_COLOR);
+        //btnLeaderboard.setStyle(BUTTON_COLOR);
 
         this.setCenter(grid); // gliglia al centro
     }

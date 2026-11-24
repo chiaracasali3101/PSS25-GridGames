@@ -19,7 +19,7 @@ public final class ScoreStats {
      * @return a map where the key is the GameType and the value is the average score for that game type
      */
     public static Map<GameType, Double> calculateAverage(final List<GameRecordImpl> scores) {
-         if(scores == null || scores.isEmpty()) {
+         if (scores == null || scores.isEmpty()) {
             return Collections.emptyMap();
         }
         return scores.stream()
