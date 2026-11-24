@@ -11,6 +11,7 @@ import it.unibo.gridgames.model.score.GameType;
 import it.unibo.gridgames.persistence.ScoreManager;
 import it.unibo.gridgames.view.menu.LeaderboardView;
 
+
 /**
  * Controller responsible for managing and displaying the leaderboard.
  */
@@ -51,6 +52,9 @@ public final class LeaderboardController {
         }
 
         this.view.updateScores(topScoresAllGames);
+
+        //per i grafici
+        this.view.updateAllCharts(allScores);
     }
 
     /**
