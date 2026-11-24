@@ -1,5 +1,6 @@
 package it.unibo.gridgames.view.game2048;
 
+import java.time.Duration;
 import java.util.function.Consumer;
 
 import it.unibo.gridgames.model.game2048.Direction;
@@ -21,14 +22,35 @@ public interface Game2048View {
      *
      * @param listener called with the chosen direction
      */
-    void setOnDirectionSelected(Consumer<Direction> listener);
+    void onDirectionSelected(Consumer<Direction> listener);
 
     /**
      * Sets what to do when the player asks to go back to the menu.
      *
      * @param listener called when the player leaves the game screen
      */
-    void setOnBackSelected(Runnable listener);
+    void onBackSelected(Runnable listener);
+
+    /**
+     * Sets what to do when the player asks for a new match.
+     *
+     * @param listener called when the player wants to start over
+     */
+    void onNewGameSelected(Runnable listener);
+
+    /**
+     * Sets what to do when the player asks to take back the last move.
+     *
+     * @param listener called when the player wants to undo a move
+     */
+    void onUndoSelected(Runnable listener);
+
+    /**
+     * Sets what to do when the player asks to save the score of the finished match.
+     *
+     * @param listener called with the name written by the player
+     */
+    void onSaveSelected(Consumer<String> listener);
 
     /**
      * Draws the current match.
@@ -38,6 +60,13 @@ public interface Game2048View {
      * @param moves the number of valid moves made so far
      */
     void showGame(int[][] grid, int score, int moves);
+
+    /**
+     * Shows how long the current match has lasted.
+     *
+     * @param elapsed the time measured so far
+     */
+    void showTime(Duration elapsed);
 
     /**
      * Tells the player that the match is over and asks for the name to save the score.

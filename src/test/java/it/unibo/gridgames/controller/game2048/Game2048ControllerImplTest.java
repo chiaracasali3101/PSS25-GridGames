@@ -8,11 +8,12 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.IOException;
 import java.time.Duration;
-import java.time.Instant;
-import java.time.InstantSource;
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Queue;
+import java.util.concurrent.Executor;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
@@ -24,12 +25,13 @@ import it.unibo.gridgames.model.game2048.Game2048Impl;
 import it.unibo.gridgames.model.game2048.GameState2048;
 import it.unibo.gridgames.model.score.GameRecordImpl;
 import it.unibo.gridgames.model.score.GameType;
+import it.unibo.gridgames.model.timer.GameTimer;
 import it.unibo.gridgames.persistence.ScoreManager;
 import it.unibo.gridgames.view.game2048.Game2048View;
 
 /**
  * Tests for {@link Game2048ControllerImpl}, with a real game and fake view,
- * score manager and clock.
+ * score manager and timer.
  */
 class Game2048ControllerImplTest {
 
@@ -42,6 +44,7 @@ class Game2048ControllerImplTest {
     private static final int[][] START = topRow(2, 2, 0, 0);
     private static final int[][] AFTER_LEFT = topRow(4, 0, 0, 0);
     private static final int[][] WINNABLE = topRow(1024, 1024, 0, 0);
+    private static final int[][] WINNABLE_IN_TWO_MOVES = topRow(1024, 0, 0, 1024);
     private static final int[][] ONE_MOVE_FROM_GAME_OVER = {
         {0, 4, 2, 4},
         {2, 8, 2, 4},
@@ -57,8 +60,10 @@ class Game2048ControllerImplTest {
 
     private final FakeView view = new FakeView();
     private final FakeScoreManager scores = new FakeScoreManager();
-    private final FakeClock clock = new FakeClock();
+    private final FakeTimer timer = new FakeTimer();
     private final BackToMenu backToMenu = new BackToMenu();
+    private final QueuedExecutor background = new QueuedExecutor();
+    private final QueuedExecutor ui = new QueuedExecutor();
 
     @Test
     void creationShowsTheFirstGame() {
@@ -138,7 +143,7 @@ class Game2048ControllerImplTest {
             () -> new Game2048Impl(ONE_MOVE_FROM_GAME_OVER, board -> {
                 board.setValue(0, SIZE - 1, 2);
                 return Optional.empty();
-            }), this.clock);
+            }), this.timer, Runnable::run, Runnable::run);
 
         controller.move(Direction.LEFT);
 
@@ -172,14 +177,14 @@ class Game2048ControllerImplTest {
 
     @Test
     void durationGoesFromTheFirstValidMoveToTheEndOfTheGame() {
-        final Game2048Controller controller = controllerOn(topRow(1024, 0, 0, 1024));
-        this.clock.advance(THIRTY_SECONDS);
+        final Game2048Controller controller = controllerOn(WINNABLE_IN_TWO_MOVES);
+        this.timer.advance(THIRTY_SECONDS);
         controller.move(Direction.UP);
-        this.clock.advance(THIRTY_SECONDS);
+        this.timer.advance(THIRTY_SECONDS);
         controller.move(Direction.DOWN);
-        this.clock.advance(THIRTY_SECONDS);
+        this.timer.advance(THIRTY_SECONDS);
         controller.move(Direction.LEFT);
-        this.clock.advance(THIRTY_SECONDS);
+        this.timer.advance(THIRTY_SECONDS);
 
         controller.saveScore(PLAYER);
 
@@ -191,12 +196,100 @@ class Game2048ControllerImplTest {
         final Game2048Controller controller = controllerOn(WINNABLE);
         controller.move(Direction.DOWN);
         controller.undo();
-        this.clock.advance(THIRTY_SECONDS);
+        this.timer.advance(THIRTY_SECONDS);
 
         controller.move(Direction.LEFT);
         controller.saveScore(PLAYER);
 
         assertEquals(THIRTY_SECONDS, this.scores.saved.getFirst().getDurationSeconds());
+    }
+
+    @Test
+    void creationShowsTheTimeAtZero() {
+        controllerOn(START);
+
+        assertEquals(Optional.of(Duration.ZERO), this.view.time);
+        assertFalse(this.timer.isRunning());
+    }
+
+    @Test
+    void anInvalidMoveDoesNotStartTheTimer() {
+        final Game2048Controller controller = controllerOn(topRow(2, 4, 0, 0));
+
+        controller.move(Direction.LEFT);
+
+        assertFalse(this.timer.isRunning());
+    }
+
+    @Test
+    void theFirstValidMoveStartsTheTimer() {
+        final Game2048Controller controller = controllerOn(START);
+
+        controller.move(Direction.LEFT);
+
+        assertTrue(this.timer.isRunning());
+    }
+
+    @Test
+    void eachTickShowsTheTimeOnTheUiThread() {
+        final Game2048Controller controller = controllerWithQueuesOn(START);
+        controller.move(Direction.LEFT);
+        this.timer.advance(THIRTY_SECONDS);
+
+        this.timer.tick();
+
+        assertEquals(Optional.of(Duration.ZERO), this.view.time);
+        this.ui.runAll();
+        assertEquals(Optional.of(Duration.ofSeconds(THIRTY_SECONDS)), this.view.time);
+    }
+
+    @Test
+    void aTickArrivingAfterANewGameDoesNotShowTheOldTime() {
+        final Game2048Controller controller = controllerWithQueuesOn(START);
+        controller.move(Direction.LEFT);
+        this.timer.advance(THIRTY_SECONDS);
+        this.timer.tick();
+
+        controller.newGame();
+        this.ui.runAll();
+
+        assertEquals(Optional.of(Duration.ZERO), this.view.time);
+    }
+
+    @Test
+    void theEndOfTheGameStopsTheTimerAndShowsTheFinalTime() {
+        final Game2048Controller controller = controllerOn(WINNABLE_IN_TWO_MOVES);
+        controller.move(Direction.DOWN);
+        this.timer.advance(THIRTY_SECONDS);
+
+        controller.move(Direction.LEFT);
+
+        assertFalse(this.timer.isRunning());
+        assertEquals(Optional.of(Duration.ofSeconds(THIRTY_SECONDS)), this.view.time);
+    }
+
+    @Test
+    void newGameResetsTheTime() {
+        final Game2048Controller controller = controllerOn(START);
+        controller.move(Direction.LEFT);
+        this.timer.advance(THIRTY_SECONDS);
+
+        controller.newGame();
+
+        assertFalse(this.timer.isRunning());
+        assertEquals(Duration.ZERO, this.timer.getElapsed());
+        assertEquals(Optional.of(Duration.ZERO), this.view.time);
+    }
+
+    @Test
+    void goingBackToTheMenuStopsTheTimer() {
+        final Game2048Controller controller = controllerOn(START);
+        controller.move(Direction.LEFT);
+
+        this.view.backListener.run();
+
+        assertFalse(this.timer.isRunning());
+        assertTrue(this.backToMenu.called);
     }
 
     @Test
@@ -258,7 +351,7 @@ class Game2048ControllerImplTest {
         final Game2048Controller controller = controllerOn(WINNABLE);
         controller.move(Direction.LEFT);
         controller.saveScore(PLAYER);
-        this.clock.advance(THIRTY_SECONDS);
+        this.timer.advance(THIRTY_SECONDS);
 
         controller.newGame();
         controller.move(Direction.LEFT);
@@ -306,25 +399,130 @@ class Game2048ControllerImplTest {
     }
 
     @Test
-    void nullArgumentsAreRejected() {
-        final Supplier<Game2048> games = Game2048Impl::new;
+    void newGameInTheViewStartsAFreshGame() {
+        final Game2048Controller controller = controllerOn(START);
+        controller.move(Direction.LEFT);
 
-        assertThrows(NullPointerException.class,
-            () -> new Game2048ControllerImpl(null, this.scores, this.backToMenu, games, this.clock));
-        assertThrows(NullPointerException.class,
-            () -> new Game2048ControllerImpl(this.view, null, this.backToMenu, games, this.clock));
-        assertThrows(NullPointerException.class,
-            () -> new Game2048ControllerImpl(this.view, this.scores, null, games, this.clock));
-        assertThrows(NullPointerException.class,
-            () -> new Game2048ControllerImpl(this.view, this.scores, this.backToMenu, null, this.clock));
-        assertThrows(NullPointerException.class,
-            () -> new Game2048ControllerImpl(this.view, this.scores, this.backToMenu, games, null));
+        this.view.newGameListener.run();
+
+        assertArrayEquals(START, this.view.grid);
+        assertEquals(0, this.view.moves);
     }
 
-    // partita reale sulla griglia data, senza tessere casuali
+    @Test
+    void undoInTheViewTakesBackTheLastMove() {
+        final Game2048Controller controller = controllerOn(START);
+        controller.move(Direction.LEFT);
+
+        this.view.undoListener.run();
+
+        assertArrayEquals(START, this.view.grid);
+        assertEquals(0, this.view.score);
+    }
+
+    @Test
+    void theNameEnteredInTheViewSavesTheFinishedGame() {
+        final Game2048Controller controller = controllerOn(WINNABLE);
+        controller.move(Direction.LEFT);
+
+        this.view.saveListener.accept(PLAYER);
+
+        assertEquals(PLAYER, this.scores.saved.getFirst().getPlayerName());
+        assertTrue(this.view.scoreSaved);
+    }
+
+    @Test
+    void theScoreIsWrittenInTheBackgroundAndShownOnTheUiThread() {
+        final Game2048Controller controller = controllerWithQueuesOn(WINNABLE);
+        controller.move(Direction.LEFT);
+
+        controller.saveScore(PLAYER);
+
+        assertTrue(this.scores.saved.isEmpty());
+        this.background.runAll();
+        assertEquals(1, this.scores.saved.size());
+        assertFalse(this.view.scoreSaved);
+        this.ui.runAll();
+        assertTrue(this.view.scoreSaved);
+    }
+
+    @Test
+    void aBackgroundFailureIsShownOnTheUiThread() {
+        final Game2048Controller controller = controllerWithQueuesOn(WINNABLE);
+        controller.move(Direction.LEFT);
+        this.scores.failing = true;
+
+        controller.saveScore(PLAYER);
+        this.background.runAll();
+
+        assertTrue(this.view.saveError.isEmpty());
+        this.ui.runAll();
+        assertEquals(DISK_ERROR, this.view.saveError);
+    }
+
+    @Test
+    void aSaveRequestedWhileSavingIsIgnored() {
+        final Game2048Controller controller = controllerWithQueuesOn(WINNABLE);
+        controller.move(Direction.LEFT);
+
+        controller.saveScore(PLAYER);
+        controller.saveScore(PLAYER);
+        this.background.runAll();
+        this.ui.runAll();
+
+        assertEquals(1, this.scores.saved.size());
+    }
+
+    @Test
+    void aSaveEndingAfterANewGameDoesNotAffectTheNewGame() {
+        final Game2048Controller controller = controllerWithQueuesOn(WINNABLE);
+        controller.move(Direction.LEFT);
+        controller.saveScore(PLAYER);
+
+        controller.newGame();
+        this.background.runAll();
+        this.ui.runAll();
+
+        assertFalse(this.view.scoreSaved);
+        controller.move(Direction.LEFT);
+        controller.saveScore(PLAYER);
+        this.background.runAll();
+        this.ui.runAll();
+        assertEquals(2, this.scores.saved.size());
+        assertTrue(this.view.scoreSaved);
+    }
+
+    @Test
+    void nullArgumentsAreRejected() {
+        final Supplier<Game2048> games = Game2048Impl::new;
+        final Executor now = Runnable::run;
+
+        assertThrows(NullPointerException.class,
+            () -> new Game2048ControllerImpl(null, this.scores, this.backToMenu, games, this.timer, now, now));
+        assertThrows(NullPointerException.class,
+            () -> new Game2048ControllerImpl(this.view, null, this.backToMenu, games, this.timer, now, now));
+        assertThrows(NullPointerException.class,
+            () -> new Game2048ControllerImpl(this.view, this.scores, null, games, this.timer, now, now));
+        assertThrows(NullPointerException.class,
+            () -> new Game2048ControllerImpl(this.view, this.scores, this.backToMenu, null, this.timer, now, now));
+        assertThrows(NullPointerException.class,
+            () -> new Game2048ControllerImpl(this.view, this.scores, this.backToMenu, games, null, now, now));
+        assertThrows(NullPointerException.class,
+            () -> new Game2048ControllerImpl(this.view, this.scores, this.backToMenu, games, this.timer, null, now));
+        assertThrows(NullPointerException.class,
+            () -> new Game2048ControllerImpl(this.view, this.scores, this.backToMenu, games, this.timer, now, null));
+    }
+
+    // partita reale sulla griglia data, senza tessere casuali; salvataggio immediato
     private Game2048Controller controllerOn(final int[][] grid) {
         return new Game2048ControllerImpl(this.view, this.scores, this.backToMenu,
-            () -> new Game2048Impl(grid, board -> Optional.empty()), this.clock);
+            () -> new Game2048Impl(grid, board -> Optional.empty()), this.timer, Runnable::run, Runnable::run);
+    }
+
+    // come controllerOn, ma il salvataggio e l'aggiornamento della view aspettano runAll()
+    private Game2048Controller controllerWithQueuesOn(final int[][] grid) {
+        return new Game2048ControllerImpl(this.view, this.scores, this.backToMenu,
+            () -> new Game2048Impl(grid, board -> Optional.empty()), this.timer, this.background, this.ui);
     }
 
     private static int[][] topRow(final int... values) {
@@ -342,12 +540,16 @@ class Game2048ControllerImplTest {
         private int score;
         private int moves;
         private int redraws;
+        private Optional<Duration> time = Optional.empty();
         private Optional<GameState2048> ended = Optional.empty();
         private boolean scoreSaved;
         private String saveError = "";
         private int shown;
         private Consumer<Direction> directionListener = direction -> { };
         private Runnable backListener = () -> { };
+        private Runnable newGameListener = () -> { };
+        private Runnable undoListener = () -> { };
+        private Consumer<String> saveListener = name -> { };
 
         @Override
         public void show() {
@@ -355,12 +557,27 @@ class Game2048ControllerImplTest {
         }
 
         @Override
-        public void setOnDirectionSelected(final Consumer<Direction> listener) {
+        public void onSaveSelected(final Consumer<String> listener) {
+            this.saveListener = listener;
+        }
+
+        @Override
+        public void onNewGameSelected(final Runnable listener) {
+            this.newGameListener = listener;
+        }
+
+        @Override
+        public void onUndoSelected(final Runnable listener) {
+            this.undoListener = listener;
+        }
+
+        @Override
+        public void onDirectionSelected(final Consumer<Direction> listener) {
             this.directionListener = listener;
         }
 
         @Override
-        public void setOnBackSelected(final Runnable listener) {
+        public void onBackSelected(final Runnable listener) {
             this.backListener = listener;
         }
 
@@ -370,6 +587,11 @@ class Game2048ControllerImplTest {
             this.score = newScore;
             this.moves = newMoves;
             this.redraws++;
+        }
+
+        @Override
+        public void showTime(final Duration elapsed) {
+            this.time = Optional.of(elapsed);
         }
 
         @Override
@@ -444,19 +666,86 @@ class Game2048ControllerImplTest {
     }
 
     /**
-     * Clock that moves only when the test asks it to.
+     * Executor that keeps the tasks until the test runs them, to simulate another thread.
      */
-    private static final class FakeClock implements InstantSource {
+    private static final class QueuedExecutor implements Executor {
 
-        private Instant now = Instant.EPOCH;
+        private final Queue<Runnable> tasks = new ArrayDeque<>();
 
         @Override
-        public Instant instant() {
-            return this.now;
+        public void execute(final Runnable task) {
+            this.tasks.add(task);
+        }
+
+        private void runAll() {
+            while (!this.tasks.isEmpty()) {
+                this.tasks.remove().run();
+            }
+        }
+    }
+
+    /**
+     * Timer whose time moves and ticks only when the test asks it to.
+     */
+    private static final class FakeTimer implements GameTimer {
+
+        private Duration elapsed = Duration.ZERO;
+        private boolean running;
+        private Consumer<Duration> tickListener = time -> { };
+
+        @Override
+        public void start() {
+            if (!this.running) {
+                this.elapsed = Duration.ZERO;
+                this.running = true;
+            }
+        }
+
+        @Override
+        public void pause() {
+            throw new UnsupportedOperationException("the controller never pauses the timer");
+        }
+
+        @Override
+        public void resume() {
+            throw new UnsupportedOperationException("the controller never pauses the timer");
+        }
+
+        @Override
+        public void stop() {
+            this.running = false;
+        }
+
+        @Override
+        public void reset() {
+            this.running = false;
+            this.elapsed = Duration.ZERO;
+        }
+
+        @Override
+        public Duration getElapsed() {
+            return this.elapsed;
+        }
+
+        @Override
+        public boolean isRunning() {
+            return this.running;
+        }
+
+        @Override
+        public void onTick(final Consumer<Duration> listener) {
+            this.tickListener = listener;
         }
 
         private void advance(final long seconds) {
-            this.now = this.now.plus(Duration.ofSeconds(seconds));
+            if (this.running) {
+                this.elapsed = this.elapsed.plusSeconds(seconds);
+            }
+        }
+
+        // come il thread del timer: avvisa con il tempo misurato finora
+        private void tick() {
+            this.tickListener.accept(this.elapsed);
         }
     }
 }
