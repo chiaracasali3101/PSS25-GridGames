@@ -37,7 +37,6 @@ public final class Game2048Impl implements Game2048 {
     public Game2048Impl(final TileSpawner spawner) {
         this(new int[SIZE][SIZE], spawner);
         for (int i = 0; i < INITIAL_TILES; i++) {
-            // la nuova tessera compare solo se la mossa ha cambiato la griglia
             this.spawner.spawn(this.board);
         }
     }
